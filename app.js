@@ -8,6 +8,24 @@
   $("site-author").textContent = S.autor;
   $("year").textContent = new Date().getFullYear();
 
+  // contacto
+  const tel = S.telefono || "", mail = S.email || "", wa = S.whatsapp || "";
+  $("c-autor").textContent = S.autor;
+  $("c-tel").href = "tel:" + tel.replace(/\s/g, ""); $("c-tel-t").textContent = tel;
+  $("c-mail").href = "mailto:" + mail; $("c-mail-t").textContent = mail;
+  $("c-wa").href = "https://wa.me/" + wa + "?text=" + encodeURIComponent("Hola, vi su sitio Geotec-Estructural y quisiera consultar.");
+  $("c-wa-t").textContent = tel;
+
+  // cifras de portada
+  const cuenta = (t) => ITEMS.filter(i => i.tipo === t).length;
+  const st = [[ITEMS.length, "elementos"], [cuenta("Calculadora"), "calculadoras"], [new Set(ITEMS.map(i => i.area)).size, "áreas"]];
+  $("stats").innerHTML = st.map(x => "<div><b>" + x[0] + "</b>" + x[1] + "</div>").join("");
+
+  // aparición suave de tarjetas
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .08 }) : null;
+  const revelar = (el) => { el.classList.add("reveal"); if (io) io.observe(el); else el.classList.add("in"); };
+  document.querySelectorAll(".contact").forEach(revelar);
+
   const tipos = ["Todos", ...Array.from(new Set(ITEMS.map(i => i.tipo)))];
   let tipoActivo = "Todos";
 
@@ -44,6 +62,7 @@
       const externo = /^https?:|^mailto:/.test(i.url);
       const c = document.createElement("article");
       c.className = "card " + i.area;
+      revelar(c);
 
       const meta = document.createElement("div");
       meta.className = "meta";

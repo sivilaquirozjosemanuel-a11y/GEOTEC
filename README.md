@@ -50,3 +50,16 @@ Cada vez que subas cambios, el sitio se actualiza solo.
 ## Nota
 
 Todo lo que subas a un sitio público lo puede ver cualquiera. Si algún documento no debe ser público, déjalo en Drive con acceso restringido y enlázalo solo si corresponde.
+
+
+## Módulo de laboratorio de suelos
+
+- `laboratorio/` : páginas de ensayo (índice, granulometría e hidrometría, límites, clasificación).
+- `assets/` : motor de cálculo (`suelos.js`), utilidades y estilos (`lab.js`, `lab.css`).
+- `dev/test_suelos.js` : pruebas numéricas (opcional; `node dev/test_suelos.js`).
+
+Cada página genera un reporte: use «Imprimir / guardar PDF», elija «Guardar como PDF» y desactive «Encabezados y pies de página». Los datos se guardan solo en su navegador. Para actualizar el sitio, suba estas carpetas y archivos al repositorio de GitHub reemplazando los existentes.
+
+## Contacto y tema
+
+El teléfono, WhatsApp y correo se editan en `data.js` (campos `telefono`, `whatsapp`, `email`). El botón de modo claro/oscuro y el botón de WhatsApp los añade `assets/site.js` en todas las páginas.

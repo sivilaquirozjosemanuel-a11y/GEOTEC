@@ -6,36 +6,74 @@
   <title>Geotec-Estructural</title>
   <meta name="description" content="Cuadernos, cursos, asesorías, informes y reportes de laboratorio de Estructuras y Geotecnia.">
   <link rel="stylesheet" href="style.css">
+  <script src="assets/site.js"></script>
 </head>
 <body>
-  <header class="hero">
+  <header class="topbar screen-only">
     <div class="wrap">
-      <h1 id="site-title"></h1>
-      <p id="site-subtitle"></p>
+      <a class="brand" href="#inicio" aria-label="Geotec-Estructural, inicio">
+        <span style="display:inline-flex"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><rect width="64" height="64" rx="14" fill="#6f4528"/><path d="M14 24h36M18 24v-6h28v6" stroke="#fff8ef" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 24v14M32 24v14M44 24v14" stroke="#fff8ef" stroke-width="3.5" stroke-linecap="round"/><path d="M10 45c7-4 11 4 22 0s15 4 22 0M10 53c7-4 11 4 22 0s15 4 22 0" stroke="#d9b48a" stroke-width="3" fill="none" stroke-linecap="round"/></svg></span>
+        <span>Geotec-Estructural<small>Geotecnia · Estructuras</small></span>
+      </a>
+      <nav class="nav" aria-label="Principal">
+        <a class="hide-sm" href="#contenido">Contenido</a>
+        <a class="hide-sm" href="laboratorio/index.html">Laboratorio</a>
+        <a href="#contacto">Contacto</a>
+        <span id="theme-slot"></span>
+      </nav>
     </div>
   </header>
 
+  <section class="hero" id="inicio">
+    <div class="wrap">
+      <p class="eyebrow">Ingeniería civil</p>
+      <h1 id="site-title"></h1>
+      <p id="site-subtitle"></p>
+      <div class="cta">
+        <a class="solid" href="laboratorio/index.html">Laboratorio de suelos</a>
+        <a href="#contenido">Ver contenido</a>
+        <a href="#contacto">Contacto</a>
+      </div>
+      <div class="stats" id="stats"></div>
+    </div>
+  </section>
+
   <main class="wrap">
-    <section class="controls" aria-label="Filtros">
-      <input id="q" type="search" placeholder="Buscar por título, tema o etiqueta…" aria-label="Buscar">
-      <select id="area" aria-label="Área">
-        <option value="">Todas las áreas</option>
-        <option>Estructuras</option>
-        <option>Geotecnia</option>
-        <option>General</option>
-      </select>
+    <section class="section" id="contenido">
+      <h2>Contenido</h2>
+      <p class="lead">Cuadernos, cursos, informes, calculadoras y reportes de laboratorio.</p>
+      <div class="controls" aria-label="Filtros">
+        <input id="q" type="search" placeholder="Buscar por título, tema o etiqueta…" aria-label="Buscar">
+        <select id="area" aria-label="Área">
+          <option value="">Todas las áreas</option>
+          <option>Estructuras</option>
+          <option>Geotecnia</option>
+          <option>General</option>
+        </select>
+      </div>
+      <nav id="tabs" class="tabs" aria-label="Tipo de contenido"></nav>
+      <p id="count" class="count"></p>
+      <div id="grid" class="grid" aria-live="polite"></div>
+      <p id="empty" class="empty" hidden>No hay resultados con esos filtros.</p>
     </section>
 
-    <nav id="tabs" class="tabs" aria-label="Tipo de contenido"></nav>
-
-    <p id="count" class="count"></p>
-    <section id="grid" class="grid" aria-live="polite"></section>
-    <p id="empty" class="empty" hidden>No hay resultados con esos filtros.</p>
+    <section class="contact reveal" id="contacto">
+      <div>
+        <h2>Contacto</h2>
+        <p>¿Una asesoría, un ensayo de laboratorio o una consulta de estructuras y geotecnia? Escríbame y le respondo.</p>
+        <p style="margin-top:8px"><b id="c-autor"></b></p>
+      </div>
+      <div class="clist">
+        <a id="c-wa" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7s.7-1.9.9-2.2c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.4.1.6-.1l.8-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.4z"/></svg><span><small>WhatsApp</small><b id="c-wa-t"></b></span></a>
+        <a id="c-tel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span><small>Teléfono</small><b id="c-tel-t"></b></span></a>
+        <a id="c-mail"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg><span><small>Correo electrónico</small><b id="c-mail-t"></b></span></a>
+      </div>
+    </section>
   </main>
 
   <footer class="foot">
     <div class="wrap">
-      <span id="site-author"></span> · <span id="year"></span>
+      <span><span id="site-author"></span> · Geotec-Estructural · <span id="year"></span></span>
     </div>
   </footer>
 

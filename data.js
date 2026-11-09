@@ -5,7 +5,10 @@
 window.SITE = {
   titulo: "Geotec-Estructural",
   subtitulo: "Cuadernos, cursos, asesorías, informes y reportes de laboratorio en Geotecnia y Estructuras.",
-  autor: "José Manuel Sivila Quiroz"
+  autor: "José Manuel Sivila Quiroz",
+  telefono: "+591 75998230",
+  whatsapp: "59175998230",   // solo números, con código de país
+  email: "sivilaquirozjosemanuel@gmail.com"
 };
 
 /*
@@ -19,6 +22,34 @@ window.SITE = {
 */
 
 window.ITEMS = [
+  {
+    tipo: "Laboratorio", area: "Geotecnia",
+    titulo: "Laboratorio de suelos (calculadoras con reporte PDF)",
+    descripcion: "Índice de ensayos: granulometría, límites y clasificación disponibles; el resto próximamente.",
+    fecha: "2026-11-09", url: "laboratorio/index.html",
+    tags: ["suelos", "laboratorio", "PDF"]
+  },
+  {
+    tipo: "Calculadora", area: "Geotecnia",
+    titulo: "Granulometría e hidrometría",
+    descripcion: "Curva granulométrica, D10/D30/D60, Cu, Cc y fracciones SUCS/AASHTO/MIT. ASTM D6913 y D7928.",
+    fecha: "2026-11-09", url: "laboratorio/granulometria.html",
+    tags: ["granulometría", "hidrómetro", "ASTM D6913", "ASTM D7928"]
+  },
+  {
+    tipo: "Calculadora", area: "Geotecnia",
+    titulo: "Límites de consistencia",
+    descripcion: "LL, LP, IP y carta de plasticidad de Casagrande. ASTM D4318.",
+    fecha: "2026-11-09", url: "laboratorio/limites.html",
+    tags: ["Atterberg", "plasticidad", "ASTM D4318"]
+  },
+  {
+    tipo: "Calculadora", area: "Geotecnia",
+    titulo: "Clasificación de suelos SUCS, AASHTO y MIT",
+    descripcion: "Clasificación paso a paso con índice de grupo. ASTM D2487 y AASHTO M 145.",
+    fecha: "2026-11-09", url: "laboratorio/clasificacion.html",
+    tags: ["SUCS", "AASHTO", "MIT", "ASTM D2487"]
+  },
   {
     tipo: "Calculadora", area: "Estructuras",
     titulo: "Módulo de elasticidad del hormigón",
