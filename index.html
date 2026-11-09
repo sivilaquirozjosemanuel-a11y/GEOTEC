@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geotec-Estructural</title>
+  <meta name="description" content="Cuadernos, cursos, asesorías, informes y reportes de laboratorio de Estructuras y Geotecnia.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1 id="site-title"></h1>
+      <p id="site-subtitle"></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="controls" aria-label="Filtros">
+      <input id="q" type="search" placeholder="Buscar por título, tema o etiqueta…" aria-label="Buscar">
+      <select id="area" aria-label="Área">
+        <option value="">Todas las áreas</option>
+        <option>Estructuras</option>
+        <option>Geotecnia</option>
+        <option>General</option>
+      </select>
+    </section>
+
+    <nav id="tabs" class="tabs" aria-label="Tipo de contenido"></nav>
+
+    <p id="count" class="count"></p>
+    <section id="grid" class="grid" aria-live="polite"></section>
+    <p id="empty" class="empty" hidden>No hay resultados con esos filtros.</p>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span id="site-author"></span> · <span id="year"></span>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
