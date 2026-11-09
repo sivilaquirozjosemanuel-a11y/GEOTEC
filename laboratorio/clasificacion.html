@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clasificación de suelos</title>
+  <meta name="description" content="Clasificación de suelos por SUCS (ASTM D2487), AASHTO (M 145) y escala MIT, con el procedimiento paso a paso y reporte en PDF.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../assets/lab.css">
+  <script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="lab-hero screen-only">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">← Portal</a> · <a href="index.html">Laboratorio</a></div>
+    <h1>Clasificación de suelos</h1>
+    <p>Clasifique el suelo por SUCS, AASHTO y la escala MIT. Puede traer los datos de las páginas de granulometría y límites, o escribirlos. Verá el razonamiento paso a paso y obtendrá un reporte en PDF.</p>
+    <div class="badges">
+      <span class="nb">SUCS · ASTM D2487</span>
+      <span class="nb">AASHTO M 145 · índice de grupo</span>
+      <span class="nb">Escala MIT</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="screen-only">
+
+  <section class="panel">
+    <h2>1. Datos generales</h2>
+    <p class="hint">Aparecen en el encabezado del reporte. Se recuerdan en este navegador.</p>
+    <div id="general" class="fgrid"></div>
+    <div class="fgrid" style="margin-top:10px">
+      <div class="field"><label for="dec">Separador decimal del reporte</label>
+        <select id="dec"><option value=",">Coma (0,075)</option><option value=".">Punto (0.075)</option></select></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Datos del suelo</h2>
+    <div class="btnrow" style="margin:0 0 10px">
+      <button type="button" class="bt sec small" id="btnGran">Traer de granulometría</button>
+      <button type="button" class="bt sec small" id="btnLim">Traer de límites de consistencia</button>
+    </div>
+    <div id="origen"></div>
+    <h3>Granulometría (% en masa de la muestra total)</h3>
+    <div class="fgrid">
+      <div class="field"><label for="grava">Grava, retenida en Nº4 (%)</label><input id="grava" inputmode="decimal"></div>
+      <div class="field"><label for="arena">Arena, pasa Nº4 y retenida en Nº200 (%)</label><input id="arena" inputmode="decimal"></div>
+      <div class="field"><label for="finos">Finos, pasa Nº200 (%)</label><input id="finos" inputmode="decimal"></div>
+      <div class="field"><label for="p10">Pasa Nº10 (%)</label><input id="p10" inputmode="decimal"></div>
+      <div class="field"><label for="p40">Pasa Nº40 (%)</label><input id="p40" inputmode="decimal"></div>
+    </div>
+    <p class="hint" style="margin-top:8px">Si deja vacío uno de grava, arena o finos, se calcula como el complemento de los otros dos. Nº10 y Nº40 solo se usan en AASHTO.</p>
+    <h3>Graduación (solo para suelos con menos de 12 % de finos)</h3>
+    <div class="fgrid">
+      <div class="field"><label for="d10">D10 (mm)</label><input id="d10" inputmode="decimal"></div>
+      <div class="field"><label for="d30">D30 (mm)</label><input id="d30" inputmode="decimal"></div>
+      <div class="field"><label for="d60">D60 (mm)</label><input id="d60" inputmode="decimal"></div>
+      <div class="field"><label>Cu · Cc (calculados)</label><input id="cucc" readonly></div>
+    </div>
+    <h3>Plasticidad de los finos</h3>
+    <div class="fgrid">
+      <div class="field"><label for="ll">Límite líquido, LL (%)</label><input id="ll" inputmode="decimal"></div>
+      <div class="field"><label for="pi">Índice de plasticidad, IP (%)</label><input id="pi" inputmode="decimal"></div>
+      <div class="field chk"><input type="checkbox" id="np"><label for="np">No plástico (NP)</label></div>
+      <div class="field chk"><input type="checkbox" id="org"><label for="org">Suelo orgánico (LL secado al horno &lt; 75 % del LL natural)</label></div>
+    </div>
+    <h3>Escala MIT (opcional, requiere hidrometría)</h3>
+    <div class="fgrid">
+      <div class="field"><label for="m_grava">Grava 60–2 mm (%)</label><input id="m_grava" inputmode="decimal"></div>
+      <div class="field"><label for="m_arena">Arena 2–0,06 mm (%)</label><input id="m_arena" inputmode="decimal"></div>
+      <div class="field"><label for="m_limo">Limo 0,06–0,002 mm (%)</label><input id="m_limo" inputmode="decimal"></div>
+      <div class="field"><label for="m_arcilla">Arcilla &lt; 0,002 mm (%)</label><input id="m_arcilla" inputmode="decimal"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Resultados</h2>
+    <div class="kpis" id="kpis"></div>
+    <div id="resSucs"></div>
+    <div id="resAashto"></div>
+    <div id="resMit"></div>
+    <div class="chartbox" id="chartBar"></div>
+    <div class="chartbox" id="chartPlast" style="max-width:640px"></div>
+    <div id="alertPanel"></div>
+    <div class="btnrow">
+      <button type="button" class="bt" id="btnPdf">Imprimir / guardar PDF</button>
+      <button type="button" class="bt sec" id="btnEj">Cargar ejemplo</button>
+      <button type="button" class="bt sec" id="btnLimpiar">Limpiar todo</button>
+    </div>
+    <p class="hint" style="margin-top:10px">Para el PDF elija «Guardar como PDF» y desactive «Encabezados y pies de página».</p>
+  </section>
+
+  <h2 style="margin:26px 0 0;font-size:1.05rem">Vista previa del reporte</h2>
+</div>
+
+<article id="reporte" class="report"></article>
+</main>
+
+<footer class="foot screen-only"><div class="wrap"><span id="site-author"></span> · Geotec-Estructural</div></footer>
+
+<script src="../data.js"></script>
+<script src="../assets/suelos.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  const L = Lab, S = Suelos, $ = L.$, $$ = L.$$, fmt = L.fmt, parse = L.parse, esc = L.esc;
+  const KEY = "clasificacion_in";
+  const NORMAS = ["ASTM D2487 · Sistema Unificado de Clasificación de Suelos", "AASHTO M 145 / ASTM D3282 · Clasificación AASHTO", "Escala granulométrica MIT"];
+  const CAMPOS = ["grava", "arena", "finos", "p10", "p40", "d10", "d30", "d60", "ll", "pi", "m_grava", "m_arena", "m_limo", "m_arcilla"];
+  const ini = function (v) { return v === null || v === undefined || !isFinite(v) ? "" : String(Math.round(v * 1000) / 1000).replace(".", L.dec() === "," ? "," : "."); };
+  const num = function (id) { return parse($("#" + id).value); };
+  let origen = [];
+
+  /* ---------- importar desde las otras páginas ---------- */
+  function traerGran(silencioso) {
+    const g = L.load("granulometria");
+    if (!g) { if (!silencioso) alert("Todavía no hay datos de granulometría en este navegador. Complete primero esa página."); return false; }
+    $("#grava").value = ini(g.grava); $("#arena").value = ini(g.arena); $("#finos").value = ini(g.finos);
+    $("#p10").value = ini(g.P10); $("#p40").value = ini(g.P40);
+    $("#d10").value = ini(g.D10); $("#d30").value = ini(g.D30); $("#d60").value = ini(g.D60);
+    if (g.mit) { $("#m_grava").value = ini(g.mit.grava); $("#m_arena").value = ini(g.mit.arena); $("#m_limo").value = ini(g.mit.limo); $("#m_arcilla").value = ini(g.mit.arcilla); }
+    origen = origen.filter(function (o) { return o.indexOf("granulometría") < 0; });
+    origen.push("granulometría del " + L.fechaES(g.fecha) + (g.muestra ? " (muestra " + g.muestra + ")" : ""));
+    return true;
+  }
+  function traerLim(silencioso) {
+    const l = L.load("limites");
+    if (!l) { if (!silencioso) alert("Todavía no hay datos de límites de consistencia en este navegador. Complete primero esa página."); return false; }
+    $("#np").checked = !!l.NP;
+    $("#ll").value = ini(l.LL); $("#pi").value = ini(l.PI);
+    origen = origen.filter(function (o) { return o.indexOf("límites") < 0; });
+    origen.push("límites de consistencia del " + L.fechaES(l.fecha) + (l.muestra ? " (muestra " + l.muestra + ")" : ""));
+    return true;
+  }
+
+  /* ---------- estado ---------- */
+  function guardar() {
+    const s = { np: $("#np").checked, org: $("#org").checked, origen: origen };
+    CAMPOS.forEach(function (k) { s[k] = $("#" + k).value; });
+    L.save(KEY, s);
+  }
+  function restaurar() {
+    const s = L.load(KEY);
+    if (s) {
+      CAMPOS.forEach(function (k) { $("#" + k).value = s[k] || ""; });
+      $("#np").checked = !!s.np; $("#org").checked = !!s.org; origen = s.origen || [];
+    } else { traerGran(true); traerLim(true); }
+  }
+
+  /* ---------- cálculo ---------- */
+  function leer() {
+    let g = num("grava"), a = num("arena"), f = num("finos");
+    const faltan = [g, a, f].filter(isNaN).length;
+    if (faltan === 1) {
+      if (isNaN(g)) g = 100 - a - f; else if (isNaN(a)) a = 100 - g - f; else f = 100 - g - a;
+    }
+    const d10 = num("d10"), d30 = num("d30"), d60 = num("d60");
+    const Cu = d10 > 0 && d60 > 0 ? d60 / d10 : null;
+    const Cc = d10 > 0 && d30 > 0 && d60 > 0 ? (d30 * d30) / (d10 * d60) : null;
+    return { g: g, a: a, f: f, completo: faltan <= 1, p10: num("p10"), p40: num("p40"), Cu: Cu, Cc: Cc, d10: d10, d30: d30, d60: d60,
+      LL: num("ll"), PI: num("pi"), NP: $("#np").checked, org: $("#org").checked };
+  }
+
+  const PAL = ["#6f4528", "#2f7a6d", "#c9962b", "#4f6a9a", "#8a7d72"];
+  function chartBarras(filas) {
+    const W = 900, ml = 130, mr = 20, bh = 38, gap = 26, mt = 14, pw = W - ml - mr;
+    const H = mt + filas.length * (bh + gap) + 6;
+    let s = '<svg class="chart" viewBox="0 0 ' + W + " " + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Distribución de fracciones">';
+    filas.forEach(function (r, i) {
+      const y = mt + i * (bh + gap);
+      s += '<text x="' + (ml - 12) + '" y="' + (y + bh / 2 + 5) + '" text-anchor="end" style="font-size:15px;font-weight:700">' + esc(r.titulo) + "</text>";
+      if (!r.segs) { s += '<text x="' + ml + '" y="' + (y + bh / 2 + 5) + '" class="tick" style="font-size:14px">sin datos (requiere hidrometría)</text>'; return; }
+      let x = ml;
+      r.segs.forEach(function (sg, j) {
+        const w = Math.max(0, (sg.pct / 100) * pw);
+        s += '<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + bh + '" style="fill:' + PAL[j % PAL.length] + ';stroke:var(--halo)" stroke-width="1.5"/>';
+        if (w > 120) s += '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (y + bh / 2 + 5) + '" text-anchor="middle" style="fill:#fff;font-size:13px;font-weight:700">' + esc(sg.n) + " " + fmt(sg.pct, 1) + " %</text>";
+        else if (w > 26) s += '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (y + bh / 2 + 5) + '" text-anchor="middle" style="fill:#fff;font-size:12px;font-weight:700">' + fmt(sg.pct, 0) + "</text>";
+        x += w;
+      });
+    });
+    return s + "</svg>";
+  }
+
+  function pasosHtml(pasos) { return '<ol class="steps">' + pasos.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ol>"; }
+  function pasosReporte(pasos) { return "<ol>" + pasos.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ol>"; }
+
+  function calc() {
+    const d = leer();
+    $("#cucc").value = d.Cu ? fmt(d.Cu, 1) + " · " + fmt(d.Cc, 2) : "—";
+    $("#origen").innerHTML = origen.length ? '<div class="alert info">Datos traídos de: ' + esc(origen.join(" y ")) + ". Puede editarlos libremente.</div>" : "";
+
+    const adv = [];
+    const sucs = d.completo ? S.clasificarSUCS({ finos: d.f, grava: d.g, arena: d.a, Cu: d.Cu, Cc: d.Cc, LL: d.LL, PI: d.PI, NP: d.NP, organico: d.org })
+      : { completo: false, msg: "Ingrese al menos dos de los tres porcentajes: grava, arena y finos.", pasos: [], adv: [] };
+    const aashto = d.completo ? S.clasificarAASHTO({ P10: d.p10, P40: d.p40, P200: d.f, LL: d.LL, PI: d.PI, NP: d.NP })
+      : { completo: false, msg: "Ingrese los porcentajes de granulometría.", pasos: [], adv: [] };
+    adv.push.apply(adv, sucs.adv || []);
+    if (d.PI > 0 && d.LL > 0 && d.PI > 0.9 * (d.LL - 8) + 0.5) adv.push("El punto (LL, IP) queda sobre la línea U: combinación poco probable, revise los datos.");
+
+    // MIT
+    const mit = ["m_grava", "m_arena", "m_limo", "m_arcilla"].map(function (k) { return num(k); });
+    const hayMit = mit.every(isFinite);
+    const sumaMit = hayMit ? mit.reduce(function (s, x) { return s + x; }, 0) : 0;
+    if (hayMit && Math.abs(sumaMit - 100) > 1.5) adv.push("Las fracciones MIT suman " + fmt(sumaMit, 1) + " % (deberían sumar 100 %).");
+    const nomMit = ["Grava", "Arena", "Limo", "Arcilla"];
+    let domMit = null;
+    if (hayMit) { let k = 0; mit.forEach(function (v, i) { if (v > mit[k]) k = i; }); domMit = nomMit[k]; }
+
+    // KPIs y tarjetas
+    const kp = function (v, l, big) { return '<div class="kpi' + (big ? " big" : "") + '"><b>' + v + "</b><span>" + l + "</span></div>"; };
+    $("#kpis").innerHTML = kp(sucs.completo ? esc(sucs.sim) : "—", "SUCS (ASTM D2487)", true) + kp(aashto.completo ? esc(aashto.sim) : "—", "AASHTO (grupo e índice de grupo)", true);
+    $("#resSucs").innerHTML = "<h3>SUCS — " + (sucs.completo ? esc(sucs.sim) + ": " + esc(sucs.nombre) : "incompleto") + "</h3>" +
+      (sucs.completo ? "" : '<div class="alert warn">' + esc(sucs.msg) + "</div>") + pasosHtml(sucs.pasos);
+    $("#resAashto").innerHTML = "<h3>AASHTO — " + (aashto.completo ? esc(aashto.grupo) + " (" + aashto.GI + "): " + esc(aashto.descripcion) : "incompleto") + "</h3>" +
+      (aashto.completo ? '<p class="hint">Calificación general como subrasante: ' + esc(aashto.subrasante) + ".</p>" : '<div class="alert warn">' + esc(aashto.msg) + "</div>") + pasosHtml(aashto.pasos);
+    $("#resMit").innerHTML = "<h3>MIT — " + (hayMit ? "fracción predominante: " + domMit : "sin datos") + "</h3>" +
+      (hayMit ? '<p class="hint">Grava ' + fmt(mit[0], 1) + " % · arena " + fmt(mit[1], 1) + " % · limo " + fmt(mit[2], 1) + " % · arcilla " + fmt(mit[3], 1) + " %.</p>"
+        : '<div class="alert info">La escala MIT separa limo y arcilla (límite 0,002 mm): se necesita la hidrometría. Complete la página de granulometría o ingrese las fracciones.</div>');
+
+    // gráficos
+    const barras = [];
+    if (d.completo) {
+      barras.push({ titulo: "SUCS", segs: [{ n: "Grava", pct: d.g }, { n: "Arena", pct: d.a }, { n: "Finos", pct: d.f }] });
+      if (isFinite(d.p10) && isFinite(d.p40))
+        barras.push({ titulo: "AASHTO", segs: [{ n: "Grava", pct: 100 - d.p10 }, { n: "Arena gruesa", pct: d.p10 - d.p40 }, { n: "Arena fina", pct: d.p40 - d.f }, { n: "Limo-arcilla", pct: d.f }] });
+    }
+    barras.push({ titulo: "MIT", segs: hayMit ? mit.map(function (v, i) { return { n: nomMit[i], pct: v }; }) : null });
+    const svgB = chartBarras(barras);
+    const puntos = !d.NP && d.LL > 0 && isFinite(d.PI) ? [{ LL: d.LL, PI: d.PI, label: "Finos" }] : [];
+    const svgP = puntos.length ? L.chartPlasticidad({ puntos: puntos, uid: "s" }) : "";
+    const svgPr = puntos.length ? L.chartPlasticidad({ puntos: puntos, uid: "r" }) : "";
+    $("#chartBar").innerHTML = '<h3>Distribución de fracciones</h3>' + svgB;
+    $("#chartPlast").innerHTML = svgP ? "<h3>Carta de plasticidad</h3>" + svgP : "";
+    $("#alertPanel").innerHTML = L.alertas(adv);
+
+    guardar();
+    reporte({ d: d, sucs: sucs, aashto: aashto, hayMit: hayMit, mit: mit, nomMit: nomMit, domMit: domMit, svgB: svgB, svgP: svgPr, adv: adv });
+  }
+
+  /* ---------- reporte ---------- */
+  function reporte(c) {
+    const f = fmt, d = c.d;
+    let h = L.reportHead("Clasificación de suelos", NORMAS);
+    h += "<h2>1. Objeto</h2><p>Clasificar el suelo según el Sistema Unificado (SUCS, ASTM D2487), el sistema AASHTO (M 145) y la escala granulométrica MIT, a partir de la granulometría y los límites de consistencia.</p>";
+    if (!d.completo) { L.setReport($("#reporte"), h + '<p class="rp-warn">Ingrese los datos del suelo para generar el reporte.</p>' + L.reportFoot()); return; }
+    h += "<h2>2. Datos de entrada</h2>" + L.tabla(["Dato", "Valor"], [
+      ["Grava (retenida en Nº4)", f(d.g, 1) + " %"], ["Arena (pasa Nº4, retenida en Nº200)", f(d.a, 1) + " %"], ["Finos (pasa Nº200)", f(d.f, 1) + " %"],
+      ["Pasa Nº10 / Nº40", isFinite(d.p10) && isFinite(d.p40) ? f(d.p10, 1) + " % / " + f(d.p40, 1) + " %" : "no informado"],
+      ["D<sub>10</sub> · D<sub>30</sub> · D<sub>60</sub>", d.Cu ? [d.d10, d.d30, d.d60].map(L.fmtD).join(" · ") + " mm" : "no informado"],
+      ["C<sub>u</sub> · C<sub>c</sub>", d.Cu ? f(d.Cu, 1) + " · " + f(d.Cc, 2) : "—"],
+      ["Límite líquido, LL", d.NP ? "NP" : isFinite(d.LL) ? f(d.LL, 0) + " %" : "no informado"],
+      ["Índice de plasticidad, IP", d.NP ? "NP" : isFinite(d.PI) ? f(d.PI, 0) + " %" : "no informado"],
+      ["Suelo orgánico", d.org ? "Sí" : "No"],
+    ], [0]).replace('<table class="rt">', '<table class="rt" style="max-width:560px">');
+    h += "<h2>3. Procedimiento</h2><h3>3.1 SUCS (ASTM D2487)</h3>" + (c.sucs.completo ? pasosReporte(c.sucs.pasos) : '<p class="rp-warn">' + esc(c.sucs.msg) + "</p>") +
+      "<h3>3.2 AASHTO (M 145)</h3>" + (c.aashto.completo ? pasosReporte(c.aashto.pasos) : '<p class="rp-warn">' + esc(c.aashto.msg) + "</p>");
+    if (c.aashto.completo && c.aashto.GI > 0 || (c.aashto.completo && c.aashto.formula.indexOf("= 0") < 0)) h += L.formula(esc(c.aashto.formula).replace(/ \* /g, " · "));
+    h += "<h2>4. Resultados</h2>";
+    h += '<div class="rp-box"><div><b class="big">SUCS: ' + (c.sucs.completo ? esc(c.sucs.sim) : "—") + "</b>" + (c.sucs.completo ? " — " + esc(c.sucs.nombre) : "") + "</div>" +
+      '<div style="margin-top:6px"><b class="big">AASHTO: ' + (c.aashto.completo ? esc(c.aashto.sim) : "—") + "</b>" + (c.aashto.completo ? " — " + esc(c.aashto.descripcion) + ". Subrasante: " + esc(c.aashto.subrasante).toLowerCase() + "." : "") + "</div>" +
+      '<div style="margin-top:6px"><b class="big">MIT:</b> ' + (c.hayMit ? "fracción predominante, " + c.domMit.toLowerCase() + " (" + c.nomMit.map(function (n, i) { return n.toLowerCase() + " " + f(c.mit[i], 1) + " %"; }).join(", ") + ")" : "requiere hidrometría") + "</div></div>";
+    h += '<figure class="rp-fig">' + c.svgB + "<figcaption>Distribución de fracciones según cada sistema.</figcaption></figure>";
+    if (c.svgP) h += '<figure class="rp-fig" style="max-width:600px;margin-left:auto;margin-right:auto">' + c.svgP + "<figcaption>Carta de plasticidad con el punto de los finos del suelo.</figcaption></figure>";
+    if (c.adv.length) h += "<h2>5. Observaciones</h2>" + L.alertasReporte(c.adv);
+    h += '<p class="rp-note" style="margin-top:10px">LL e IP se redondean a números enteros antes de clasificar (D4318). Los finos con 4 ≤ IP ≤ 7 sobre la línea A se clasifican CL-ML; en suelos con 5 a 12 % de finos se asigna el sufijo M a los finos CL-ML.</p>';
+    L.setReport($("#reporte"), h + L.reportFoot());
+  }
+
+  /* ---------- ejemplo y limpieza ---------- */
+  function ejemplo() {
+    const v = { grava: 54, arena: 40, finos: 6, p10: 33, p40: 17, d10: 0.174, d30: 1.5, d60: 9.88, ll: 33, pi: 10, m_grava: 54, m_arena: 39, m_limo: 5.4, m_arcilla: 1.1 };
+    CAMPOS.forEach(function (k) { $("#" + k).value = ini(v[k]); });
+    $("#np").checked = false; $("#org").checked = false; origen = []; calc();
+  }
+
+  document.getElementById("site-author").textContent = (window.SITE && window.SITE.autor) || "";
+  L.initGeneral($("#general"), calc);
+  L.initDecimal($("#dec"), calc);
+  restaurar();
+  CAMPOS.concat(["np", "org"]).forEach(function (k) { $("#" + k).addEventListener("input", calc); $("#" + k).addEventListener("change", calc); });
+  $("#btnGran").addEventListener("click", function () { if (traerGran()) calc(); });
+  $("#btnLim").addEventListener("click", function () { if (traerLim()) calc(); });
+  $("#btnEj").addEventListener("click", ejemplo);
+  $("#btnPdf").addEventListener("click", function () { L.imprimir("Clasificacion de suelos " + (L.getGeneral().muestra || "")); });
+  $("#btnLimpiar").addEventListener("click", function () {
+    if (!confirm("¿Borrar todos los datos?")) return;
+    CAMPOS.forEach(function (k) { $("#" + k).value = ""; }); $("#np").checked = false; $("#org").checked = false; origen = []; calc();
+  });
+  calc();
+})();
+</script>
+</body>
+</html>

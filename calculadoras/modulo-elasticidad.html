@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo de elasticidad del hormigón</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="../assets/site.js"></script>
+  <style>
+    .box{max-width:520px;margin:24px auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}
+    label{display:block;margin:12px 0 4px;font-weight:600}
+    input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:inherit}
+    .res{margin-top:16px;padding:14px;border-radius:8px;background:var(--bg);border:1px solid var(--line);font-size:1.1rem}
+    .note{color:var(--muted);font-size:.85rem;margin-top:10px}
+    a.back{display:inline-block;margin:16px 0 0}
+  </style>
+</head>
+<body>
+  <div class="wrap"><a class="back" href="../index.html">← Volver al portal</a></div>
+  <div class="box">
+    <h2 style="margin-top:0">Módulo de elasticidad del hormigón (Ec)</h2>
+    <label for="u">Unidades de f'c</label>
+    <select id="u">
+      <option value="mpa">MPa</option>
+      <option value="kgf">kgf/cm²</option>
+    </select>
+    <label for="fc">Resistencia a compresión f'c</label>
+    <input id="fc" type="number" min="0" step="any" value="25">
+    <div class="res" id="res"></div>
+    <p class="note">Ec = 4700·√f'c (MPa) · Ec = 15100·√f'c (kgf/cm²), para hormigón de peso normal (ACI 318). Verifica siempre con la edición vigente de la norma que uses.</p>
+  </div>
+  <script>
+    const fc = document.getElementById("fc"), u = document.getElementById("u"), res = document.getElementById("res");
+    function calc(){
+      const v = parseFloat(fc.value);
+      if (!(v > 0)) { res.textContent = "Ingresa un valor válido."; return; }
+      const ec = u.value === "mpa" ? 4700*Math.sqrt(v) : 15100*Math.sqrt(v);
+      res.textContent = "Ec ≈ " + ec.toLocaleString("es-BO",{maximumFractionDigits:0}) + (u.value === "mpa" ? " MPa" : " kgf/cm²");
+    }
+    fc.addEventListener("input", calc); u.addEventListener("change", calc); calc();
+  </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Granulometría e hidrometría</title>
+  <meta name="description" content="Curva granulométrica por tamizado e hidrómetro 152H, con parámetros D10, D30, D60, Cu, Cc y fracciones SUCS, AASHTO y MIT. Reporte en PDF.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../assets/lab.css">
+  <script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="lab-hero screen-only">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">← Portal</a> · <a href="index.html">Laboratorio</a></div>
+    <h1>Granulometría e hidrometría</h1>
+    <p>Ingrese las masas retenidas y las lecturas del hidrómetro. Obtendrá la curva granulométrica, D10, D30, D60, Cu, Cc, las fracciones por sistema y un reporte en PDF con todos los cálculos.</p>
+    <div class="badges">
+      <span class="nb">ASTM D6913 · tamizado</span>
+      <span class="nb">ASTM D7928 · hidrómetro</span>
+      <span class="nb">SUCS · AASHTO · MIT</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="screen-only">
+
+  <section class="panel">
+    <h2>1. Datos generales</h2>
+    <p class="hint">Aparecen en el encabezado del reporte. Se recuerdan en este navegador.</p>
+    <div id="general" class="fgrid"></div>
+    <div class="fgrid" style="margin-top:10px">
+      <div class="field"><label for="dec">Separador decimal del reporte</label>
+        <select id="dec"><option value=",">Coma (0,075)</option><option value=".">Punto (0.075)</option></select></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Tamizado (ASTM D6913)</h2>
+    <p class="hint">Escriba la masa retenida en cada tamiz, en gramos. Puede pegar columnas desde Excel. Los tamices se pueden editar o agregar.</p>
+    <div class="fgrid">
+      <div class="field"><label for="mini">Masa seca inicial (g)</label><input id="mini" inputmode="decimal" placeholder="opcional, para el control de pérdida"></div>
+    </div>
+    <div class="tablewrap">
+      <table class="inp" id="tabTam">
+        <thead><tr><th>Tamiz</th><th>Abertura (mm)</th><th>Masa retenida (g)</th><th>% retenido</th><th>% ret. acumulado</th><th>% que pasa</th><th></th></tr></thead>
+        <tbody id="tbTam">
+          <tr class="fondo">
+            <td><input class="txt" value="Fondo" readonly></td><td><input value="—" readonly></td>
+            <td><input id="pan" inputmode="decimal"></td>
+            <td class="calc" id="panPct"></td><td class="calc" id="panCum"></td><td class="calc main">—</td><td class="del"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="btnrow">
+      <button type="button" class="bt sec small" id="addTam">+ Agregar tamiz</button>
+      <button type="button" class="bt sec small" id="stdTam">Restaurar serie estándar</button>
+    </div>
+    <div id="qcTam"></div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Hidrometría (ASTM D7928, hidrómetro 152H)</h2>
+    <div class="field chk"><input type="checkbox" id="usaHid"><label for="usaHid">Incluir ensayo de hidrómetro</label></div>
+    <div id="hidBox" hidden>
+      <p class="hint">La muestra del hidrómetro es el material que pasa el tamiz indicado; sus porcentajes se convierten a la muestra total con el % que pasa ese tamiz.</p>
+      <div class="fgrid">
+        <div class="field"><label for="gs">Gravedad específica, Gs</label><input id="gs" inputmode="decimal" value="2,65"></div>
+        <div class="field"><label for="ws">Masa seca de la muestra, Ws (g)</label><input id="ws" inputmode="decimal" value="50"></div>
+        <div class="field"><label for="tcut">Tamiz de la muestra</label>
+          <select id="tcut"><option value="4.75">Nº4 (4,75 mm)</option><option value="2" selected>Nº10 (2,00 mm)</option><option value="0.075">Nº200 (0,075 mm)</option></select></div>
+        <div class="field"><label for="fz">Corrección cero, Fz</label><input id="fz" inputmode="decimal" value="0"></div>
+        <div class="field"><label for="cm">Corrección de menisco, Cm</label><input id="cm" inputmode="decimal" value="1"></div>
+        <div class="field"><label for="defl">Defloculante</label><input id="defl" value="Hexametafosfato de sodio" class="txt"></div>
+      </div>
+      <p class="hint" style="margin-top:10px">Lectura R: la que se observa en el borde superior del menisco. Fz es la lectura del hidrómetro en la solución con defloculante (sin suelo).</p>
+      <div class="tablewrap">
+        <table class="inp" id="tabHid">
+          <thead><tr><th>t (min)</th><th>T (°C)</th><th>Lectura R</th><th>Ct</th><th>Rc</th><th>P (%)</th><th>L (cm)</th><th>D (mm)</th><th>% que pasa (total)</th><th></th></tr></thead>
+          <tbody id="tbHid"></tbody>
+        </table>
+      </div>
+      <div class="btnrow"><button type="button" class="bt sec small" id="addHid">+ Agregar lectura</button></div>
+      <div id="qcHid"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>4. Resultados</h2>
+    <div class="kpis" id="kpis"></div>
+    <div style="margin:10px 0 4px"><span class="hint" style="margin-right:8px">Fracciones según:</span><span id="segEsc"></span></div>
+    <div class="chartbox" id="chartPanel"></div>
+    <div id="fraccPanel"></div>
+    <div id="alertPanel"></div>
+    <div class="btnrow">
+      <button type="button" class="bt" id="btnPdf">Imprimir / guardar PDF</button>
+      <button type="button" class="bt sec" id="btnCsv">Exportar CSV</button>
+      <button type="button" class="bt sec" id="btnEj">Cargar ejemplo</button>
+      <button type="button" class="bt sec" id="btnLimpiar">Limpiar todo</button>
+    </div>
+    <p class="hint" style="margin-top:10px">Para el PDF, en la ventana de impresión elija «Guardar como PDF» y desactive «Encabezados y pies de página». Los resultados quedan guardados para usarlos en la página de <a href="clasificacion.html">clasificación de suelos</a>.</p>
+  </section>
+
+  <h2 style="margin:26px 0 0;font-size:1.05rem">Vista previa del reporte</h2>
+</div>
+
+<article id="reporte" class="report"></article>
+</main>
+
+<footer class="foot screen-only"><div class="wrap"><span id="site-author"></span> · Geotec-Estructural</div></footer>
+
+<script src="../data.js"></script>
+<script src="../assets/suelos.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  const L = Lab, S = Suelos, $ = L.$, $$ = L.$$, fmt = L.fmt, parse = L.parse, esc = L.esc;
+  const KEY = "granulometria_in";
+  let escala = "SUCS", uid = 0;
+  const NORMAS = [
+    "ASTM D6913 · Análisis granulométrico por tamizado",
+    "ASTM D7928 · Análisis por sedimentación (hidrómetro)",
+    "ASTM D2487 · SUCS (fracciones)",
+    "AASHTO M 145 · Clasificación (fracciones)",
+    "Escala granulométrica MIT",
+  ];
+  const nz = function (v, d) { return isNaN(v) ? (d || 0) : v; };
+  const ini = function (v) {
+    if (v === null || v === undefined || v === "") return "";
+    return String(v).replace(".", L.dec() === "," ? "," : ".");
+  };
+  const tb = $("#tbTam"), fondo = $("tr.fondo", tb), tbH = $("#tbHid");
+
+  /* ---------- filas de las tablas ---------- */
+  function tpl(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
+
+  function filaTam(name, d, ret) {
+    const tr = tpl(
+      '<tr class="fila"><td><input class="txt" data-k="name" value="' + esc(name || "") + '"></td>' +
+      '<td><input data-k="d" inputmode="decimal" value="' + esc(ini(d)) + '"></td>' +
+      '<td><input data-k="ret" inputmode="decimal" value="' + esc(ini(ret)) + '"></td>' +
+      '<td class="calc" data-c="pctRet"></td><td class="calc" data-c="cum"></td><td class="calc main" data-c="pasa"></td>' +
+      '<td class="del"><button type="button" class="xbtn" title="Quitar fila">✕</button></td></tr>'
+    );
+    tr.dataset.id = "t" + (++uid);
+    tr.querySelector(".xbtn").addEventListener("click", function () { tr.remove(); calc(); });
+    tb.insertBefore(tr, fondo);
+    return tr;
+  }
+  function filaHid(t, T, R) {
+    const tr = tpl(
+      '<tr class="fila"><td><input data-k="t" inputmode="decimal" value="' + esc(ini(t)) + '"></td>' +
+      '<td><input data-k="T" inputmode="decimal" value="' + esc(ini(T)) + '"></td>' +
+      '<td><input data-k="R" inputmode="decimal" value="' + esc(ini(R)) + '"></td>' +
+      '<td class="calc" data-c="Ct"></td><td class="calc" data-c="Rc"></td><td class="calc" data-c="P"></td>' +
+      '<td class="calc" data-c="L"></td><td class="calc" data-c="D"></td><td class="calc main" data-c="Ptot"></td>' +
+      '<td class="del"><button type="button" class="xbtn" title="Quitar fila">✕</button></td></tr>'
+    );
+    tr.dataset.id = "h" + (++uid);
+    tr.querySelector(".xbtn").addEventListener("click", function () { tr.remove(); calc(); });
+    tbH.appendChild(tr);
+    return tr;
+  }
+  function serieEstandar() {
+    $$("tr.fila", tb).forEach(function (r) { r.remove(); });
+    S.TAMICES.forEach(function (t) { filaTam(t.name, t.d, ""); });
+  }
+  function lecturasBase() {
+    tbH.innerHTML = "";
+    [2, 5, 15, 30, 60, 250, 1440].forEach(function (t) { filaHid(t, "", ""); });
+  }
+  const val = function (tr, k) { return tr.querySelector('[data-k="' + k + '"]').value; };
+  function leerTam() {
+    return $$("tr.fila", tb).map(function (tr) {
+      const d = parse(val(tr, "d"));
+      return { id: tr.dataset.id, name: val(tr, "name").trim() || (isNaN(d) ? "" : fmt(d, 3)), d: d, ret: parse(val(tr, "ret")) };
+    });
+  }
+  function leerHid() {
+    return $$("tr.fila", tbH).map(function (tr) {
+      return { id: tr.dataset.id, t: parse(val(tr, "t")), T: parse(val(tr, "T")), R: parse(val(tr, "R")) };
+    });
+  }
+  const cell = function (tr, k) { return tr.querySelector('[data-c="' + k + '"]'); };
+
+  /* ---------- estado ---------- */
+  function guardarEstado() {
+    L.save(KEY, {
+      mini: $("#mini").value, pan: $("#pan").value,
+      filas: $$("tr.fila", tb).map(function (tr) { return [val(tr, "name"), val(tr, "d"), val(tr, "ret")]; }),
+      usaHid: $("#usaHid").checked,
+      hid: { gs: $("#gs").value, ws: $("#ws").value, tcut: $("#tcut").value, fz: $("#fz").value, cm: $("#cm").value, defl: $("#defl").value },
+      lect: $$("tr.fila", tbH).map(function (tr) { return [val(tr, "t"), val(tr, "T"), val(tr, "R")]; }),
+      escala: escala,
+    });
+  }
+  function restaurar() {
+    const s = L.load(KEY);
+    if (!s || !s.filas) { serieEstandar(); lecturasBase(); return; }
+    $("#mini").value = s.mini || ""; $("#pan").value = s.pan || "";
+    $$("tr.fila", tb).forEach(function (r) { r.remove(); });
+    s.filas.forEach(function (f) { const tr = filaTam("", "", ""); tr.querySelector('[data-k="name"]').value = f[0]; tr.querySelector('[data-k="d"]').value = f[1]; tr.querySelector('[data-k="ret"]').value = f[2]; });
+    $("#usaHid").checked = !!s.usaHid;
+    if (s.hid) { $("#gs").value = s.hid.gs; $("#ws").value = s.hid.ws; $("#tcut").value = s.hid.tcut; $("#fz").value = s.hid.fz; $("#cm").value = s.hid.cm; $("#defl").value = s.hid.defl; }
+    tbH.innerHTML = "";
+    (s.lect || []).forEach(function (r) { const tr = filaHid("", "", ""); tr.querySelector('[data-k="t"]').value = r[0]; tr.querySelector('[data-k="T"]').value = r[1]; tr.querySelector('[data-k="R"]').value = r[2]; });
+    if (!$$("tr.fila", tbH).length) lecturasBase();
+    if (s.escala) escala = s.escala;
+  }
+
+  /* ---------- cálculo principal ---------- */
+  function calc() {
+    const usa = $("#usaHid").checked;
+    $("#hidBox").hidden = !usa;
+    const filas = leerTam();
+    const tam = S.tamizado(filas, parse($("#pan").value), parse($("#mini").value));
+    // tabla de tamizado
+    const mapa = {};
+    tam.filas.forEach(function (r) { mapa[r.id] = r; });
+    $$("tr.fila", tb).forEach(function (tr) {
+      const r = mapa[tr.dataset.id];
+      cell(tr, "pctRet").textContent = r ? fmt(r.pctRet, 2) : "";
+      cell(tr, "cum").textContent = r ? fmt(r.cum, 2) : "";
+      cell(tr, "pasa").textContent = r ? fmt(r.pasa, 2) : "";
+    });
+    $("#panPct").textContent = tam.suma > 0 ? fmt(tam.panPct, 2) : "";
+    $("#panCum").textContent = tam.suma > 0 ? fmt(100, 2) : "";
+    $("#qcTam").innerHTML = (tam.suma > 0 ? '<div class="alert info">Masa total recuperada: ' + fmt(tam.suma, 1) + " g" +
+      (tam.perdida ? " · pérdida respecto a la masa inicial: " + fmt(tam.perdida.g, 1) + " g (" + fmt(tam.perdida.pct, 2) + " %)" : "") + "</div>" : "") +
+      L.alertas(tam.adv.filter(function (a) { return a.indexOf("Ingrese") !== 0; }));
+
+    // hidrómetro
+    let hid = null, Pref = 100, avisos = [];
+    if (usa) {
+      const dcut = parse($("#tcut").value);
+      const pp = tam.puntos.length ? S.pasaEn(tam.puntos, dcut) : null;
+      if (pp) Pref = pp.v; else avisos.push("No se pudo obtener el % que pasa el tamiz de la muestra del hidrómetro (revise el tamizado); se usó 100 %.");
+      hid = S.hidrometria({ Gs: parse($("#gs").value), Ws: parse($("#ws").value), Fz: nz(parse($("#fz").value)), Cm: nz(parse($("#cm").value), 1), Pref: Pref }, leerHid());
+      const m2 = {};
+      hid.filas.forEach(function (r) { m2[r.id] = r; });
+      $$("tr.fila", tbH).forEach(function (tr) {
+        const r = m2[tr.dataset.id];
+        cell(tr, "Ct").textContent = r ? fmt(r.Ct, 2) : "";
+        cell(tr, "Rc").textContent = r ? fmt(r.Rc, 2) : "";
+        cell(tr, "P").textContent = r ? fmt(r.P, 1) : "";
+        cell(tr, "L").textContent = r ? fmt(r.L, 2) : "";
+        cell(tr, "D").textContent = r ? L.fmtD(r.D) : "";
+        cell(tr, "Ptot").textContent = r ? fmt(r.Ptot, 2) : "";
+      });
+      $("#qcHid").innerHTML = '<div class="alert info">% que pasa el tamiz de la muestra del hidrómetro (' + fmt(dcut, dcut < 1 ? 3 : 2) + " mm): " + fmt(Pref, 2) + " %. Factor a = " +
+        fmt(hid.a, 3) + "</div>" + L.alertas(hid.adv.concat(avisos));
+    }
+
+    const comb = S.curvaCombinada(tam, hid);
+    const par = S.parametros(comb);
+    const adv = tam.adv.filter(function (a) { return a.indexOf("Ingrese") !== 0; }).concat(hid ? hid.adv : [], avisos);
+    if (comb.length >= 2 && !S.verificarMonotonia(comb)) adv.push("La curva combinada no es creciente con el diámetro: revise los datos del hidrómetro o del tamizado.");
+
+    const g = function (d) { const r = S.pasaEn(comb, d); return r ? r.v : null; };
+    const P4 = g(4.75), P10 = g(2.0), P40 = g(0.425), P200 = g(0.075);
+    const grava = P4 === null ? null : 100 - P4;
+    const arena = P4 === null || P200 === null ? null : P4 - P200;
+    const frs = { SUCS: S.fracciones(comb, "SUCS"), AASHTO: S.fracciones(comb, "AASHTO"), MIT: S.fracciones(comb, "MIT") };
+    const arcilla = frs.MIT[3].nd ? null : frs.MIT[3].pct;
+
+    if (par.D10 === null && comb.length >= 2) adv.push("D10 no se puede determinar con los datos actuales (más del 10 % pasa el tamiz más fino): se requiere hidrometría.");
+
+    // KPIs
+    const kp = function (v, l, big) { return '<div class="kpi' + (big ? " big" : "") + '"><b>' + v + "</b><span>" + l + "</span></div>"; };
+    $("#kpis").innerHTML = comb.length < 2 ? "" :
+      kp(fmt(grava, 1) + " %", "Grava (4,75–75 mm)") + kp(fmt(arena, 1) + " %", "Arena (0,075–4,75 mm)") + kp(fmt(P200, 1) + " %", "Finos (< 0,075 mm)") +
+      kp(par.D10 ? L.fmtD(par.D10) : "—", "D10 (mm)") + kp(par.D30 ? L.fmtD(par.D30) : "—", "D30 (mm)") + kp(par.D60 ? L.fmtD(par.D60) : "—", "D60 (mm)") +
+      kp(par.Cu ? fmt(par.Cu, 1) : "—", "Cu = D60/D10") + kp(par.Cc ? fmt(par.Cc, 2) : "—", "Cc = D30²/(D10·D60)") +
+      (arcilla !== null ? kp(fmt(arcilla, 1) + " %", "Arcilla (< 0,002 mm)") : "");
+
+    const tamicesGraf = tam.filas.map(function (r) { return { d: r.d, name: r.name }; });
+    const svg = L.chartGranulometria({ pts: comb, escala: escala, D: par, tamices: tamicesGraf });
+    $("#chartPanel").innerHTML = svg;
+
+    // fracciones (pantalla)
+    $("#fraccPanel").innerHTML = comb.length < 2 ? "" : fraccTabla(frs[escala], S.ESCALAS[escala].nombre);
+    $("#alertPanel").innerHTML = L.alertas(adv);
+
+    // guardar para la clasificación
+    if (comb.length >= 2 && P200 !== null) {
+      L.save("granulometria", {
+        fecha: L.hoy(), muestra: L.getGeneral().muestra, finos: P200, grava: grava, arena: arena,
+        P10: P10, P40: P40, P200: P200, Cu: par.Cu, Cc: par.Cc, D10: par.D10, D30: par.D30, D60: par.D60,
+        mit: { grava: frs.MIT[0].pct, arena: frs.MIT[1].pct, limo: frs.MIT[2].pct, arcilla: frs.MIT[3].pct },
+      });
+    }
+    guardarEstado();
+    construirReporte({ tam: tam, hid: hid, Pref: Pref, comb: comb, par: par, frs: frs, svg: svg, adv: adv, P: { P4: P4, P10: P10, P40: P40, P200: P200 }, grava: grava, arena: arena });
+  }
+
+  function fraccTabla(fr, titulo) {
+    return '<h3>Fracciones ' + esc(titulo) + "</h3>" + L.tabla(
+      ["Fracción", "Límites (mm)", "% en masa"],
+      fr.map(function (f) {
+        return [esc(f.n), f.lo === 0 ? "< " + L.fmtD(f.hi) : L.fmtD(f.lo) + " – " + L.fmtD(f.hi),
+          f.nd ? "— (requiere hidrometría)" : (f.aprox ? "≈ " : "") + fmt(f.pct, 1)];
+      })
+    ).replace('<table class="rt">', '<table class="rt" style="max-width:520px">');
+  }
+
+  /* ---------- reporte ---------- */
+  function construirReporte(c) {
+    const tam = c.tam, hid = c.hid, par = c.par, f = fmt;
+    let h = L.reportHead("Análisis granulométrico" + (hid ? " por tamizado e hidrómetro" : " por tamizado"), NORMAS);
+    h += "<h2>1. Objeto</h2><p>Determinar la distribución del tamaño de las partículas del suelo mediante tamizado" +
+      (hid ? " (fracción gruesa) y sedimentación con hidrómetro 152H (fracción fina)" : "") +
+      " y calcular los parámetros de graduación y las fracciones granulométricas según los sistemas SUCS, AASHTO y MIT.</p>" +
+      '<p class="rp-note">ASTM D6913 y ASTM D7928 reemplazaron a ASTM D422 (retirada en 2016); las fórmulas del hidrómetro 152H son las clásicas de D422.</p>';
+
+    if (tam.suma <= 0) { L.setReport($("#reporte"), h + '<p class="rp-warn">Ingrese los datos del ensayo para generar el reporte.</p>' + L.reportFoot()); return; }
+
+    // 2. datos de entrada
+    h += "<h2>2. Datos de entrada</h2><h3>2.1 Tamizado</h3>" +
+      L.tabla(["Concepto", "Valor"], [
+        ["Masa seca inicial, M<sub>ini</sub>", tam.Mini ? f(tam.Mini, 1) + " g" : "no informada"],
+        ["Masa total recuperada, M<sub>t</sub> = Σ m<sub>i</sub> + fondo", f(tam.suma, 1) + " g"],
+      ]).replace('<table class="rt">', '<table class="rt" style="max-width:520px">') +
+      L.tabla(["Tamiz", "Abertura (mm)", "Masa retenida (g)"],
+        tam.filas.map(function (r) { return [esc(r.name), L.fmtD(r.d), f(r.ret, 1)]; }).concat([["Fondo", "—", f(tam.panM, 1)]]), [0]);
+    if (hid) {
+      const g = L.getGeneral();
+      h += "<h3>2.2 Hidrometría</h3>" + L.tabla(["Parámetro", "Valor"], [
+        ["Gravedad específica de los sólidos, G<sub>s</sub>", f(parse($("#gs").value), 3)],
+        ["Masa seca de la muestra, W<sub>s</sub>", f(parse($("#ws").value), 2) + " g"],
+        ["Muestra del hidrómetro: material que pasa", esc($("#tcut").selectedOptions[0].textContent)],
+        ["Corrección cero, F<sub>z</sub>", f(nz(parse($("#fz").value)), 2)],
+        ["Corrección de menisco, C<sub>m</sub>", f(nz(parse($("#cm").value), 1), 2)],
+        ["Defloculante", esc($("#defl").value)],
+      ], [0]).replace('<table class="rt">', '<table class="rt" style="max-width:520px">') +
+        L.tabla(["t (min)", "T (°C)", "Lectura R"], hid.filas.map(function (r) { return [f(r.t, 1), f(r.T, 1), f(r.R, 1)]; }), []);
+    }
+
+    // 3. procedimiento
+    h += "<h2>3. Procedimiento de cálculo</h2><h3>3.1 Tamizado</h3>" +
+      L.formula("% retenido = (m<sub>i</sub> / M<sub>t</sub>) × 100", "m<sub>i</sub>: masa retenida en el tamiz i · M<sub>t</sub> = " + f(tam.suma, 1) + " g (retenidos + fondo)") +
+      L.formula("% que pasa = 100 − Σ (% retenido)", "Se acumula desde el tamiz de mayor abertura.");
+    if (tam.perdida)
+      h += L.formula("Pérdida = (M<sub>ini</sub> − M<sub>t</sub>) / M<sub>ini</sub> × 100 = (" + f(tam.Mini, 1) + " − " + f(tam.suma, 1) + ") / " + f(tam.Mini, 1) + " × 100 = " + f(tam.perdida.pct, 2) + " %", "Control de la pesada; indicativo ≤ 1 %.");
+    if (hid && hid.filas.length) {
+      const r0 = hid.filas[0], Gs = parse($("#gs").value), Ws = parse($("#ws").value), Fz = nz(parse($("#fz").value)), Cm = nz(parse($("#cm").value), 1);
+      h += "<h3>3.2 Hidrometría (ejemplo con la lectura a t = " + f(r0.t, 0) + " min)</h3>" +
+        L.formula("a = 1,65·G<sub>s</sub> / [(G<sub>s</sub> − 1)·2,65] = 1,65 × " + f(Gs, 3) + " / [(" + f(Gs, 3) + " − 1) × 2,65] = " + f(hid.a, 3), "Factor de corrección por gravedad específica.") +
+        L.formula("R<sub>c</sub> = R − F<sub>z</sub> + C<sub>t</sub> = " + f(r0.R, 1) + " − " + f(Fz, 2) + " + " + f(r0.Ct, 2) + " = " + f(r0.Rc, 2), "C<sub>t</sub> se interpola de la tabla del hidrómetro 152H (calibrado a 20 °C) para T = " + f(r0.T, 1) + " °C.") +
+        L.formula("P = (a · R<sub>c</sub> / W<sub>s</sub>) × 100 = (" + f(hid.a, 3) + " × " + f(r0.Rc, 2) + " / " + f(Ws, 2) + ") × 100 = " + f(r0.P, 2) + " %", "Porcentaje más fino que D respecto de la muestra del hidrómetro.") +
+        L.formula("L = 16,29 − 0,164·(R + C<sub>m</sub>) = 16,29 − 0,164 × (" + f(r0.R, 1) + " + " + f(Cm, 2) + ") = " + f(r0.L, 2) + " cm", "Profundidad efectiva.") +
+        L.formula("D = K·√(L / t),  K = √[30·η / (980·(G<sub>s</sub> − G<sub>1</sub>))] = √[30 × " + f(r0.eta, 5) + " / (980 × (" + f(Gs, 3) + " − " + f(r0.G1, 4) + "))] = " + f(r0.K, 5) +
+          "<br>D = " + f(r0.K, 5) + " × √(" + f(r0.L, 2) + " / " + f(r0.t, 0) + ") = " + L.fmtD(r0.D) + " mm", "η: viscosidad del agua en poise a " + f(r0.T, 1) + " °C · G<sub>1</sub>: densidad relativa del agua a esa temperatura.") +
+        L.formula("% que pasa (muestra total) = P × P<sub>ref</sub> / 100 = " + f(r0.P, 2) + " × " + f(c.Pref, 2) + " / 100 = " + f(r0.Ptot, 2) + " %", "P<sub>ref</sub>: % que pasa el tamiz del que se tomó la muestra del hidrómetro.");
+    }
+    h += "<h3>" + (hid ? "3.3" : "3.2") + " Parámetros de graduación</h3>" +
+      L.formula("C<sub>u</sub> = D<sub>60</sub> / D<sub>10</sub>" + (par.Cu ? " = " + L.fmtD(par.D60) + " / " + L.fmtD(par.D10) + " = " + f(par.Cu, 1) : ""), "D<sub>x</sub>: diámetro por debajo del cual pasa x % del suelo (interpolación lineal en escala logarítmica).") +
+      L.formula("C<sub>c</sub> = D<sub>30</sub>² / (D<sub>10</sub> · D<sub>60</sub>)" + (par.Cc ? " = " + L.fmtD(par.D30) + "² / (" + L.fmtD(par.D10) + " × " + L.fmtD(par.D60) + ") = " + f(par.Cc, 2) : ""));
+
+    // 4. resultados
+    h += "<h2>4. Resultados</h2><h3>4.1 Tamizado</h3>" +
+      L.tabla(["Tamiz", "Abertura (mm)", "Masa ret. (g)", "% retenido", "% ret. acum.", "% que pasa"],
+        tam.filas.map(function (r) { return [esc(r.name), L.fmtD(r.d), f(r.ret, 1), f(r.pctRet, 2), f(r.cum, 2), "<b>" + f(r.pasa, 2) + "</b>"]; })
+          .concat([["Fondo", "—", f(tam.panM, 1), f(tam.panPct, 2), f(100, 2), "—"]]), [0]);
+    if (hid && hid.filas.length)
+      h += "<h3>4.2 Hidrometría</h3>" + L.tabla(["t (min)", "T (°C)", "R", "C<sub>t</sub>", "R<sub>c</sub>", "P (%)", "L (cm)", "D (mm)", "% que pasa (total)"],
+        hid.filas.map(function (r) { return [f(r.t, 0), f(r.T, 1), f(r.R, 1), f(r.Ct, 2), f(r.Rc, 2), f(r.P, 1), f(r.L, 2), L.fmtD(r.D), "<b>" + f(r.Ptot, 2) + "</b>"]; }), []);
+    h += "<h3>" + (hid ? "4.3" : "4.2") + " Curva granulométrica</h3>" +
+      '<figure class="rp-fig">' + c.svg + "<figcaption>Curva granulométrica. Círculos: tamizado" + (hid ? " · rombos: hidrómetro" : "") + ". Escala de fracciones: " + esc(S.ESCALAS[escala].nombre) + ".</figcaption></figure>";
+    h += "<h3>" + (hid ? "4.4" : "4.3") + " Parámetros y fracciones</h3>" + L.tabla(["Parámetro", "Valor"], [
+      ["D<sub>10</sub>", par.D10 ? L.fmtD(par.D10) + " mm" : "no determinable"],
+      ["D<sub>30</sub>", par.D30 ? L.fmtD(par.D30) + " mm" : "no determinable"],
+      ["D<sub>60</sub>", par.D60 ? L.fmtD(par.D60) + " mm" : "no determinable"],
+      ["Coeficiente de uniformidad C<sub>u</sub>", par.Cu ? f(par.Cu, 1) : "—"],
+      ["Coeficiente de curvatura C<sub>c</sub>", par.Cc ? f(par.Cc, 2) : "—"],
+      ["% que pasa Nº4 / Nº10 / Nº40 / Nº200", [c.P.P4, c.P.P10, c.P.P40, c.P.P200].map(function (v) { return v === null ? "—" : f(v, 1); }).join(" / ")],
+    ], [0]).replace('<table class="rt">', '<table class="rt" style="max-width:560px">');
+    ["SUCS", "AASHTO", "MIT"].forEach(function (k) { h += fraccTabla(c.frs[k], S.ESCALAS[k].nombre); });
+    if (c.adv.length) h += "<h2>5. Observaciones</h2>" + L.alertasReporte(c.adv);
+    h += '<p class="rp-note" style="margin-top:10px">Los porcentajes se calculan sobre la masa total recuperada. La curva une los datos con una interpolación monótona; los marcadores son los puntos medidos. ' +
+      "D<sub>x</sub> y las fracciones se interpolan linealmente en el logaritmo del diámetro.</p>";
+    h += L.reportFoot();
+    L.setReport($("#reporte"), h);
+  }
+
+  /* ---------- ejemplo, CSV, limpiar ---------- */
+  function ejemplo() {
+    const m = { '3"': 0, '2"': 0, '1½"': 45, '1"': 110, "¾\"": 90, "½\"": 95, "⅜\"": 70, "Nº4": 130, "Nº10": 130, "Nº20": 90, "Nº40": 70, "Nº60": 45, "Nº100": 35, "Nº200": 30 };
+    $$("tr.fila", tb).forEach(function (r) { r.remove(); });
+    S.TAMICES.forEach(function (t) { filaTam(t.name, t.d, m[t.name]); });
+    $("#mini").value = ini(1000); $("#pan").value = "60";
+    $("#usaHid").checked = true;
+    $("#gs").value = ini(2.65); $("#ws").value = "50"; $("#tcut").value = "2"; $("#fz").value = "2"; $("#cm").value = "1";
+    tbH.innerHTML = "";
+    [[2, 21, 8.5], [5, 21, 7.5], [15, 21, 6.5], [30, 20.5, 5.5], [60, 20.5, 5], [250, 20, 4], [1440, 19.5, 3.5]].forEach(function (r) { filaHid(r[0], r[1], r[2]); });
+    calc();
+  }
+  function csv() {
+    const tam = S.tamizado(leerTam(), parse($("#pan").value), parse($("#mini").value));
+    const rows = [["Tamiz", "Abertura (mm)", "Masa retenida (g)", "% retenido", "% retenido acumulado", "% que pasa"]];
+    tam.filas.forEach(function (r) { rows.push([r.name, fmt(r.d, 3), fmt(r.ret, 1), fmt(r.pctRet, 2), fmt(r.cum, 2), fmt(r.pasa, 2)]); });
+    rows.push(["Fondo", "", fmt(tam.panM, 1), fmt(tam.panPct, 2), fmt(100, 2), ""]);
+    if ($("#usaHid").checked) {
+      const hid = S.hidrometria({ Gs: parse($("#gs").value), Ws: parse($("#ws").value), Fz: nz(parse($("#fz").value)), Cm: nz(parse($("#cm").value), 1), Pref: 100 }, leerHid());
+      rows.push([], ["t (min)", "T (°C)", "R", "Ct", "Rc", "P (%)", "L (cm)", "D (mm)"]);
+      hid.filas.forEach(function (r) { rows.push([fmt(r.t, 0), fmt(r.T, 1), fmt(r.R, 1), fmt(r.Ct, 2), fmt(r.Rc, 2), fmt(r.P, 2), fmt(r.L, 2), fmt(r.D, 5)]); });
+    }
+    L.downloadCSV("granulometria.csv", rows);
+  }
+
+  /* ---------- arranque ---------- */
+  document.getElementById("site-author").textContent = (window.SITE && window.SITE.autor) || "";
+  L.initGeneral($("#general"), calc);
+  L.initDecimal($("#dec"), calc);
+  restaurar();
+  L.segmented($("#segEsc"), [["SUCS", "SUCS"], ["AASHTO", "AASHTO"], ["MIT", "MIT"]], escala, function (k) { escala = k; calc(); });
+  ["#tabTam", "#tabHid"].forEach(function (s) { L.enablePaste($(s), calc); $(s).addEventListener("input", calc); });
+  ["#mini", "#usaHid", "#gs", "#ws", "#tcut", "#fz", "#cm", "#defl"].forEach(function (s) { $(s).addEventListener("input", calc); $(s).addEventListener("change", calc); });
+  $("#addTam").addEventListener("click", function () { filaTam("", "", "").querySelector("input").focus(); });
+  $("#stdTam").addEventListener("click", function () { serieEstandar(); calc(); });
+  $("#addHid").addEventListener("click", function () { filaHid("", "", "").querySelector("input").focus(); });
+  $("#btnPdf").addEventListener("click", function () { L.imprimir("Granulometria " + (L.getGeneral().muestra || "")); });
+  $("#btnCsv").addEventListener("click", csv);
+  $("#btnEj").addEventListener("click", ejemplo);
+  $("#btnLimpiar").addEventListener("click", function () {
+    if (!confirm("¿Borrar todos los datos de este ensayo?")) return;
+    $("#mini").value = ""; $("#pan").value = ""; $("#usaHid").checked = false;
+    serieEstandar(); lecturasBase(); calc();
+  });
+  calc();
+})();
+</script>
+</body>
+</html>

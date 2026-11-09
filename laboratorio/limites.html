@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Límites de consistencia</title>
+  <meta name="description" content="Límite líquido, límite plástico e índice de plasticidad según ASTM D4318, con curva de flujo, carta de plasticidad y reporte en PDF.">
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../assets/lab.css">
+  <script src="../assets/site.js"></script>
+</head>
+<body>
+<header class="lab-hero screen-only">
+  <div class="wrap">
+    <div class="crumb"><a href="../index.html">← Portal</a> · <a href="index.html">Laboratorio</a></div>
+    <h1>Límites de consistencia</h1>
+    <p>Calcule el límite líquido (multipunto o un punto), el límite plástico y el índice de plasticidad. Obtendrá la curva de flujo, la carta de plasticidad de Casagrande y un reporte en PDF.</p>
+    <div class="badges">
+      <span class="nb">ASTM D4318</span>
+      <span class="nb">Método A (multipunto) · Método B (un punto)</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+<div class="screen-only">
+
+  <section class="panel">
+    <h2>1. Datos generales</h2>
+    <p class="hint">Aparecen en el encabezado del reporte. Se recuerdan en este navegador.</p>
+    <div id="general" class="fgrid"></div>
+    <div class="fgrid" style="margin-top:10px">
+      <div class="field"><label for="dec">Separador decimal del reporte</label>
+        <select id="dec"><option value=",">Coma (0,075)</option><option value=".">Punto (0.075)</option></select></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>2. Límite líquido</h2>
+    <div class="fgrid">
+      <div class="field"><label for="metodo">Método</label>
+        <select id="metodo"><option value="A">Método A — multipunto (3 o más ensayos)</option><option value="B">Método B — un punto (2 ensayos)</option></select></div>
+    </div>
+    <p class="hint" id="hintLL" style="margin-top:8px"></p>
+    <div class="tablewrap">
+      <table class="inp" id="tabLL">
+        <thead><tr><th>N.º de golpes</th><th>Tara N.º</th><th>Masa tara (g)</th><th>Tara + suelo húmedo (g)</th><th>Tara + suelo seco (g)</th><th>w (%)</th><th title="LL estimado solo con este ensayo (método empírico de un punto, válido de 20 a 30 golpes)">LL 1 punto (%)</th><th title="Distancia vertical del punto a la recta de ajuste (puntos usados)">Desv. recta (%)</th><th title="Desmarque para descartar un punto alejado">Usar</th><th></th></tr></thead>
+        <tbody id="tbLL"></tbody>
+      </table>
+    </div>
+    <div class="btnrow"><button type="button" class="bt sec small" id="addLL">+ Agregar ensayo</button><button type="button" class="bt sec small" id="dropLL">Descartar el punto más alejado</button><button type="button" class="bt sec small" id="allLL">Usar todos</button></div>
+    <p class="hint" style="margin-top:8px">Puede hacer más de tres ensayos y quitar el check «Usar» de los puntos que se alejan de la recta: no entran al ajuste, pero quedan dibujados (círculo vacío) y listados en el reporte. Se necesitan al menos 3 puntos usados.</p>
+    <div id="qcLL"></div>
+  </section>
+
+  <section class="panel">
+    <h2>3. Límite plástico</h2>
+    <div class="fgrid">
+      <div class="field chk"><input type="checkbox" id="np"><label for="np">No plástico (NP): no se pudo formar el rollito de 3,2 mm</label></div>
+    </div>
+    <div id="plBox">
+      <div class="tablewrap">
+        <table class="inp" id="tabPL">
+          <thead><tr><th>Tara N.º</th><th>Masa tara (g)</th><th>Tara + suelo húmedo (g)</th><th>Tara + suelo seco (g)</th><th>w (%)</th><th></th></tr></thead>
+          <tbody id="tbPL"></tbody>
+        </table>
+      </div>
+      <div class="btnrow"><button type="button" class="bt sec small" id="addPL">+ Agregar determinación</button></div>
+    </div>
+    <div id="qcPL"></div>
+    <h3>Humedad natural (opcional)</h3>
+    <div class="fgrid"><div class="field"><label for="wn">Humedad natural, w<sub>n</sub> (%)</label><input id="wn" inputmode="decimal" placeholder="para índice de liquidez"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>4. Resultados</h2>
+    <div class="kpis" id="kpis"></div>
+    <div id="zona"></div>
+    <div class="chartbox" id="chartFlujo"></div>
+    <div class="chartbox" id="chartPlast" style="max-width:640px"></div>
+    <div id="alertPanel"></div>
+    <div class="btnrow">
+      <button type="button" class="bt" id="btnPdf">Imprimir / guardar PDF</button>
+      <button type="button" class="bt sec" id="btnCsv">Exportar CSV</button>
+      <button type="button" class="bt sec" id="btnEj">Cargar ejemplo</button>
+      <button type="button" class="bt sec" id="btnLimpiar">Limpiar todo</button>
+    </div>
+    <p class="hint" style="margin-top:10px">Para el PDF elija «Guardar como PDF» y desactive «Encabezados y pies de página». Los resultados quedan guardados para la <a href="clasificacion.html">clasificación de suelos</a>.</p>
+  </section>
+
+  <h2 style="margin:26px 0 0;font-size:1.05rem">Vista previa del reporte</h2>
+</div>
+
+<article id="reporte" class="report"></article>
+</main>
+
+<footer class="foot screen-only"><div class="wrap"><span id="site-author"></span> · Geotec-Estructural</div></footer>
+
+<script src="../data.js"></script>
+<script src="../assets/suelos.js"></script>
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+  const L = Lab, S = Suelos, $ = L.$, $$ = L.$$, fmt = L.fmt, parse = L.parse, esc = L.esc;
+  const KEY = "limites_in";
+  const NORMAS = ["ASTM D4318 · Límite líquido, límite plástico e índice de plasticidad", "ASTM D2487 · Carta de plasticidad (SUCS)"];
+  const ZONAS = {
+    CL: "arcilla de baja plasticidad (CL)", CH: "arcilla de alta plasticidad (CH)", ML: "limo de baja plasticidad (ML u OL)",
+    MH: "limo de alta plasticidad (MH u OH)", "CL-ML": "zona rayada: arcilla limosa (CL-ML)",
+  };
+  let uid = 0;
+  const tbLL = $("#tbLL"), tbPL = $("#tbPL");
+  const ini = function (v) { return v === null || v === undefined || v === "" ? "" : String(v).replace(".", L.dec() === "," ? "," : "."); };
+  function tpl(h) { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; }
+  const val = function (tr, k) { return tr.querySelector('[data-k="' + k + '"]').value; };
+  const cell = function (tr, k) { return tr.querySelector('[data-c="' + k + '"]'); };
+
+  function filaLL(N, tara, hum, sec, id, usar) {
+    const tr = tpl('<tr class="fila"><td><input data-k="N" inputmode="decimal" value="' + esc(ini(N)) + '"></td><td><input class="txt" data-k="id" value="' + esc(id || "") + '"></td>' +
+      '<td><input data-k="tara" inputmode="decimal" value="' + esc(ini(tara)) + '"></td><td><input data-k="hum" inputmode="decimal" value="' + esc(ini(hum)) + '"></td>' +
+      '<td><input data-k="sec" inputmode="decimal" value="' + esc(ini(sec)) + '"></td><td class="calc main" data-c="w"></td><td class="calc" data-c="ll1"></td><td class="calc" data-c="dev"></td>' +
+      '<td style="text-align:center"><input type="checkbox" data-k="use" title="Usar en el ajuste"' + (usar === false ? "" : " checked") + '></td>' +
+      '<td class="del"><button type="button" class="xbtn" title="Quitar fila">✕</button></td></tr>');
+    tr.dataset.id = "l" + (++uid);
+    tr.querySelector('[data-k="use"]').addEventListener("change", calc);
+    tr.querySelector(".xbtn").addEventListener("click", function () { tr.remove(); calc(); });
+    tbLL.appendChild(tr); return tr;
+  }
+  function filaPL(tara, hum, sec, id) {
+    const tr = tpl('<tr class="fila"><td><input class="txt" data-k="id" value="' + esc(id || "") + '"></td>' +
+      '<td><input data-k="tara" inputmode="decimal" value="' + esc(ini(tara)) + '"></td><td><input data-k="hum" inputmode="decimal" value="' + esc(ini(hum)) + '"></td>' +
+      '<td><input data-k="sec" inputmode="decimal" value="' + esc(ini(sec)) + '"></td><td class="calc main" data-c="w"></td>' +
+      '<td class="del"><button type="button" class="xbtn" title="Quitar fila">✕</button></td></tr>');
+    tr.dataset.id = "p" + (++uid);
+    tr.querySelector(".xbtn").addEventListener("click", function () { tr.remove(); calc(); });
+    tbPL.appendChild(tr); return tr;
+  }
+  function base() {
+    tbLL.innerHTML = ""; tbPL.innerHTML = "";
+    const n = $("#metodo").value === "A" ? 4 : 2;
+    for (let i = 0; i < n; i++) filaLL("", "", "", "", "");
+    filaPL("", "", "", ""); filaPL("", "", "", "");
+  }
+  function leerLL() {
+    return $$("tr.fila", tbLL).map(function (tr) {
+      const tara = parse(val(tr, "tara")), hum = parse(val(tr, "hum")), sec = parse(val(tr, "sec"));
+      return { tr: tr, usar: tr.querySelector('[data-k="use"]').checked, N: parse(val(tr, "N")), id: val(tr, "id"), tara: tara, hum: hum, sec: sec, w: S.humedad(tara, hum, sec) };
+    });
+  }
+  function leerPL() {
+    return $$("tr.fila", tbPL).map(function (tr) {
+      const tara = parse(val(tr, "tara")), hum = parse(val(tr, "hum")), sec = parse(val(tr, "sec"));
+      return { tr: tr, id: val(tr, "id"), tara: tara, hum: hum, sec: sec, w: S.humedad(tara, hum, sec) };
+    });
+  }
+
+  /* ---------- estado ---------- */
+  function guardar() {
+    L.save(KEY, {
+      metodo: $("#metodo").value, np: $("#np").checked, wn: $("#wn").value,
+      ll: $$("tr.fila", tbLL).map(function (tr) { return ["N", "tara", "hum", "sec", "id"].map(function (k) { return val(tr, k); }).concat([tr.querySelector('[data-k="use"]').checked]); }),
+      pl: $$("tr.fila", tbPL).map(function (tr) { return ["tara", "hum", "sec", "id"].map(function (k) { return val(tr, k); }); }),
+    });
+  }
+  function restaurar() {
+    const s = L.load(KEY);
+    if (!s || !s.ll) { base(); return; }
+    $("#metodo").value = s.metodo || "A"; $("#np").checked = !!s.np; $("#wn").value = s.wn || "";
+    tbLL.innerHTML = ""; tbPL.innerHTML = "";
+    s.ll.forEach(function (r) { filaLL(r[0], r[1], r[2], r[3], r[4], r[5]).querySelectorAll("input:not([type=checkbox])").forEach(function (i, j) { i.value = r[[0, 4, 1, 2, 3][j]]; }); });
+    s.pl.forEach(function (r) { filaPL(r[0], r[1], r[2], r[3]).querySelectorAll("input").forEach(function (i, j) { i.value = r[[3, 0, 1, 2][j]]; }); });
+    if (!$$("tr.fila", tbLL).length || !$$("tr.fila", tbPL).length) base();
+  }
+
+  /* ---------- cálculo ---------- */
+  function calc() {
+    const metodo = $("#metodo").value, np = $("#np").checked;
+    $("#hintLL").textContent = metodo === "A"
+      ? "Ingrese al menos 3 ensayos con golpes entre 15 y 35: uno entre 25–35, otro entre 20–30 y otro entre 15–25. El LL se lee en la recta de la curva de flujo a 25 golpes."
+      : "Ingrese dos ensayos con golpes entre 20 y 30 (los cierres no deben diferir en más de 2 golpes). El LL de cada uno es w·(N/25)^0.121; se promedian.";
+    $("#plBox").hidden = np;
+
+    const ll = leerLL(), pl = leerPL();
+    ll.forEach(function (r) { cell(r.tr, "w").textContent = isFinite(r.w) ? fmt(r.w, 2) : ""; });
+    pl.forEach(function (r) { cell(r.tr, "w").textContent = isFinite(r.w) ? fmt(r.w, 2) : ""; });
+
+    const adv = [];
+    // límite líquido
+    let resLL = null, LLraw = NaN, items = [];
+    const todos = ll.filter(function (r) { return isFinite(r.N) && r.N > 0 && isFinite(r.w); });
+    const validos = todos.filter(function (r) { return r.usar; });
+    const descartados = todos.filter(function (r) { return !r.usar; });
+    if (descartados.length) adv.push("Se descartaron " + descartados.length + " punto(s) del ajuste (" + descartados.map(function (r) { return "N = " + fmt(r.N, 0) + ", w = " + fmt(r.w, 2) + " %"; }).join("; ") + "). Deje constancia del motivo en el informe.");
+    if (metodo === "A") {
+      resLL = S.limiteLiquidoMulti(validos.map(function (r) { return { N: r.N, w: r.w }; }));
+      if (resLL.ok) LLraw = resLL.LLraw;
+      adv.push.apply(adv, resLL.adv);
+    } else {
+      items = validos.map(function (r) { return S.limiteLiquidoUnPunto(r.N, r.w); });
+      const oks = items.filter(function (i) { return i.ok; });
+      if (oks.length) {
+        LLraw = oks.reduce(function (s, i) { return s + i.LLraw; }, 0) / oks.length;
+        resLL = { ok: true, LLraw: LLraw, LL: Math.round(LLraw) };
+        items.forEach(function (i) { adv.push.apply(adv, i.adv); });
+        if (oks.length < 2) adv.push("D4318 (Método B) pide dos ensayos; se usó solo uno.");
+        else {
+          if (Math.abs(validos[0].N - validos[1].N) > 2) adv.push("Los golpes de los dos cierres difieren en más de 2: D4318 indica repetir el ensayo.");
+          adv.push("Compare los dos valores de LL (" + fmt(oks[0].LLraw, 1) + " y " + fmt(oks[1].LLraw, 1) + "): deben ser muy cercanos; verifique el criterio de repetibilidad de D4318.");
+        }
+      }
+    }
+    // LL de un punto y desviación a la recta, por fila
+    ll.forEach(function (r) {
+      const c1 = cell(r.tr, "ll1"), cd = cell(r.tr, "dev");
+      r.ll1 = NaN; r.dev = NaN;
+      if (isFinite(r.N) && r.N > 0 && isFinite(r.w)) {
+        if (r.N >= 20 && r.N <= 30) { const u = S.limiteLiquidoUnPunto(r.N, r.w); if (u.ok) r.ll1 = u.LLraw; }
+        if (metodo === "A" && resLL && resLL.ok && resLL.pts.length >= 3) r.dev = r.w - (resLL.b + resLL.m * Math.log10(r.N));
+      }
+      c1.textContent = isFinite(r.ll1) ? fmt(r.ll1, 1) : "—";
+      cd.textContent = isFinite(r.dev) ? (r.dev > 0 ? "+" : "") + fmt(r.dev, 2) : "";
+      cd.style.color = isFinite(r.dev) && Math.abs(r.dev) > 1 && r.usar ? "var(--c-warn)" : "";
+      r.tr.style.opacity = r.usar ? "" : ".55";
+    });
+    // límite plástico
+    const wsPL = pl.map(function (r) { return r.w; });
+    const resPL = np ? null : S.limitePlastico(wsPL);
+    if (resPL && resPL.ok) adv.push.apply(adv, resPL.adv);
+    if (resPL && resPL.ok && resPL.dif > 1.5) adv.push("Las determinaciones del límite plástico difieren " + fmt(resPL.dif, 2) + " puntos: repita si su procedimiento exige menor dispersión.");
+    // humedad natural e índices
+    const wn = parse($("#wn").value);
+    const idx = (np || (isFinite(LLraw) && resPL && resPL.ok))
+      ? S.indicesPlasticidad({ LL: LLraw, PL: resPL && resPL.ok ? resPL.PLraw : NaN, wn: isNaN(wn) ? undefined : wn, Fi: resLL && resLL.Fi, NP: np })
+      : null;
+    if (idx) adv.push.apply(adv, idx.adv);
+
+    // KPIs
+    const kp = function (v, l, big) { return '<div class="kpi' + (big ? " big" : "") + '"><b>' + v + "</b><span>" + l + "</span></div>"; };
+    let k = "";
+    if (idx) {
+      if (idx.NP) k = kp("NP", "Suelo no plástico", true) + (isFinite(LLraw) ? kp(fmt(Math.round(LLraw), 0) + " %", "LL (informativo)") : "");
+      else k = kp(fmt(idx.LL, 0) + " %", "Límite líquido (LL)") + kp(fmt(idx.PL, 0) + " %", "Límite plástico (PL)") + kp(fmt(idx.PI, 0) + " %", "Índice de plasticidad (IP)", true) +
+        (resLL && resLL.Fi ? kp(fmt(resLL.Fi, 1), "Índice de flujo, Fi") : "") + (idx.Tw ? kp(fmt(idx.Tw, 2), "Tenacidad, Tw = IP/Fi") : "") +
+        (idx.IL !== undefined ? kp(fmt(idx.IL, 2), "Índice de liquidez, IL") + kp(fmt(idx.IC, 2), "Consistencia relativa, IC") : "");
+    } else if (isFinite(LLraw)) k = kp(fmt(Math.round(LLraw), 0) + " %", "Límite líquido (LL)", true);
+    $("#kpis").innerHTML = k;
+
+    // zona de la carta
+    let zona = null;
+    if (idx && !idx.NP) zona = S.clasFinos(idx.LL, idx.PI, false, false).sim;
+    else if (idx && idx.NP) zona = "ML";
+    $("#zona").innerHTML = idx ? '<div class="alert info"><b>Carta de plasticidad:</b> el punto cae en la zona de ' + (idx.NP ? "limo no plástico (ML)" : ZONAS[zona]) +
+      (idx.NP ? "" : ". " + S.descPlasticidad(idx.PI) + " (Burmister)") + ".<br><small>Es solo la posición en la carta; la clasificación SUCS completa depende también de la granulometría.</small></div>" : "";
+
+    // gráficos
+    const pts = validos.map(function (r) { return { N: r.N, w: r.w }; });
+    const svgF = L.chartFlujo({ pts: pts, excl: descartados.map(function (r) { return { N: r.N, w: r.w }; }), m: resLL && resLL.m, b: resLL && resLL.b, LL: LLraw });
+    const svgP = L.chartPlasticidad({ puntos: idx && !idx.NP ? [{ LL: idx.LL, PI: idx.PI, label: "Muestra" }] : [], uid: "s" });
+    const svgPr = L.chartPlasticidad({ puntos: idx && !idx.NP ? [{ LL: idx.LL, PI: idx.PI, label: "Muestra" }] : [], uid: "r" });
+    $("#chartFlujo").innerHTML = svgF; $("#chartPlast").innerHTML = svgP;
+    $("#alertPanel").innerHTML = L.alertas(adv);
+
+    if (idx) L.save("limites", { fecha: L.hoy(), muestra: L.getGeneral().muestra, NP: !!idx.NP, LL: idx.NP ? (isFinite(LLraw) ? Math.round(LLraw) : null) : idx.LL, PL: idx.NP ? null : idx.PL, PI: idx.NP ? 0 : idx.PI, wn: isNaN(wn) ? null : wn });
+    guardar();
+    reporte({ metodo: metodo, np: np, ll: ll, pl: pl, resLL: resLL, items: items, LLraw: LLraw, resPL: resPL, idx: idx, wn: wn, zona: zona, svgF: svgF, svgP: svgPr, adv: adv, validos: validos, descartados: descartados });
+  }
+
+  /* ---------- reporte ---------- */
+  function reporte(c) {
+    const f = fmt;
+    let h = L.reportHead("Límites de consistencia (Atterberg)", NORMAS);
+    h += "<h2>1. Objeto</h2><p>Determinar el límite líquido (LL), el límite plástico (PL) y el índice de plasticidad (IP) de la fracción fina del suelo, y ubicar el resultado en la carta de plasticidad de Casagrande.</p>";
+    if (!c.idx && !isFinite(c.LLraw)) { L.setReport($("#reporte"), h + '<p class="rp-warn">Ingrese los datos del ensayo para generar el reporte.</p>' + L.reportFoot()); return; }
+
+    h += "<h2>2. Datos de entrada</h2><h3>2.1 Límite líquido — Método " + (c.metodo === "A" ? "A (multipunto)" : "B (un punto)") + "</h3>";
+    h += L.tabla(["N.º golpes", "Tara", "M<sub>tara</sub> (g)", "M<sub>tara+húm</sub> (g)", "M<sub>tara+seco</sub> (g)", "M<sub>agua</sub> (g)", "M<sub>seco</sub> (g)", "w (%)", "LL 1 punto (%)", "Desv. (%)", "Uso"],
+      c.ll.filter(function (r) { return isFinite(r.w); }).map(function (r) {
+        return [f(r.N, 0), esc(r.id) || "—", f(r.tara, 2), f(r.hum, 2), f(r.sec, 2), f(r.hum - r.sec, 2), f(r.sec - r.tara, 2), "<b>" + f(r.w, 2) + "</b>",
+          isFinite(r.ll1) ? f(r.ll1, 1) : "—", isFinite(r.dev) ? (r.dev > 0 ? "+" : "") + f(r.dev, 2) : "—", r.usar ? "Sí" : "<b>Descartado</b>"];
+      }), [1]);
+    h += '<p class="rp-note">«LL 1 punto» es el LL que daría ese ensayo por sí solo con el método empírico de un punto (solo entre 20 y 30 golpes). «Desv.» es la distancia vertical del punto a la recta de ajuste.</p>';
+    if (!c.np) {
+      h += "<h3>2.2 Límite plástico</h3>" + L.tabla(["Determinación", "Tara", "M<sub>tara</sub> (g)", "M<sub>tara+húm</sub> (g)", "M<sub>tara+seco</sub> (g)", "M<sub>agua</sub> (g)", "M<sub>seco</sub> (g)", "w (%)"],
+        c.pl.filter(function (r) { return isFinite(r.w); }).map(function (r, i) {
+          return [String(i + 1), esc(r.id) || "—", f(r.tara, 2), f(r.hum, 2), f(r.sec, 2), f(r.hum - r.sec, 2), f(r.sec - r.tara, 2), "<b>" + f(r.w, 2) + "</b>"];
+        }), [0, 1]);
+    } else h += "<h3>2.2 Límite plástico</h3><p>No fue posible formar el rollito de 3,2 mm: el suelo se informa como <b>no plástico (NP)</b>.</p>";
+
+    h += "<h2>3. Procedimiento de cálculo</h2>" +
+      L.formula("w = (M<sub>tara+húm</sub> − M<sub>tara+seco</sub>) / (M<sub>tara+seco</sub> − M<sub>tara</sub>) × 100", "Contenido de humedad de cada ensayo.");
+    const v0 = c.ll.find(function (r) { return isFinite(r.w); });
+    if (v0) h += L.formula("Ejemplo (primer ensayo): w = (" + f(v0.hum, 2) + " − " + f(v0.sec, 2) + ") / (" + f(v0.sec, 2) + " − " + f(v0.tara, 2) + ") × 100 = " + f(v0.w, 2) + " %");
+    if (c.metodo === "A" && c.resLL && c.resLL.ok) {
+      const r = c.resLL;
+      h += L.formula("w = b + m · log<sub>10</sub>(N)   (ajuste por mínimos cuadrados: m = " + f(r.m, 3) + ", b = " + f(r.b, 2) + (r.r2 !== null ? ", R² = " + f(r.r2, 3) : "") + ")", "Curva de flujo: humedad contra el logaritmo del número de golpes.") +
+        L.formula("LL = b + m · log<sub>10</sub>(25) = " + f(r.b, 2) + " + (" + f(r.m, 3) + ") × " + f(Math.log10(25), 4) + " = " + f(r.LLraw, 2) + " % ≈ <b>" + f(r.LL, 0) + " %</b>", "Humedad de la recta a 25 golpes, informada como número entero.") +
+        L.formula("F<sub>i</sub> = −m = " + f(r.Fi, 2), "Índice de flujo: pendiente de la curva de flujo por ciclo logarítmico.");
+    }
+    if (c.metodo === "B" && c.items.length) {
+      h += L.formula("LL = w · (N / 25)<sup>0,121</sup>", "Método B de D4318 (válido para 20 a 30 golpes).");
+      c.validos.forEach(function (r, i) {
+        const it = c.items[i];
+        if (it && it.ok) h += L.formula("Ensayo " + (i + 1) + ": LL = " + f(r.w, 2) + " × (" + f(r.N, 0) + " / 25)<sup>0,121</sup> = " + f(r.w, 2) + " × " + f(it.k, 4) + " = " + f(it.LLraw, 2) + " %");
+      });
+      h += L.formula("LL promedio = " + f(c.LLraw, 2) + " % ≈ <b>" + f(Math.round(c.LLraw), 0) + " %</b>");
+    }
+    if (!c.np && c.resPL && c.resPL.ok)
+      h += L.formula("PL = promedio de las determinaciones = " + f(c.resPL.media, 2) + " % ≈ <b>" + f(c.resPL.PL, 0) + " %</b>", "Dispersión entre determinaciones: " + f(c.resPL.dif, 2) + " puntos.");
+    if (c.idx && !c.idx.NP) {
+      h += L.formula("IP = LL − PL = " + f(c.idx.LL, 0) + " − " + f(c.idx.PL, 0) + " = <b>" + f(c.idx.PI, 0) + " %</b>", "Se restan los valores ya redondeados (D4318).");
+      if (c.idx.IL !== undefined)
+        h += L.formula("IL = (w<sub>n</sub> − PL) / IP = (" + f(c.wn, 1) + " − " + f(c.idx.PL, 0) + ") / " + f(c.idx.PI, 0) + " = " + f(c.idx.IL, 2) + "    ·    IC = (LL − w<sub>n</sub>) / IP = " + f(c.idx.IC, 2));
+      if (c.idx.Tw) h += L.formula("T<sub>w</sub> = IP / F<sub>i</sub> = " + f(c.idx.PI, 0) + " / " + f(c.resLL.Fi, 2) + " = " + f(c.idx.Tw, 2), "Índice de tenacidad.");
+    }
+
+    h += "<h2>4. Resultados</h2>";
+    if (c.idx) {
+      h += '<div class="rp-box">' + (c.idx.NP ? "<b class='big'>Suelo no plástico (NP)</b>" :
+        "<div><b class='big'>LL = " + f(c.idx.LL, 0) + " %   ·   PL = " + f(c.idx.PL, 0) + " %   ·   IP = " + f(c.idx.PI, 0) + " %</b></div><div>" + S.descPlasticidad(c.idx.PI) + " (Burmister). Posición en la carta de Casagrande: " + ZONAS[c.zona] + ".</div>") + "</div>";
+    }
+    h += '<figure class="rp-fig">' + c.svgF + "<figcaption>Curva de flujo. Línea de ajuste y lectura del LL a 25 golpes.</figcaption></figure>";
+    h += '<figure class="rp-fig" style="max-width:600px;margin-left:auto;margin-right:auto">' + c.svgP + "<figcaption>Carta de plasticidad de Casagrande (ASTM D2487): líneas A y U, LL = 50 y zona CL-ML rayada.</figcaption></figure>";
+    if (c.adv.length) h += "<h2>5. Observaciones</h2>" + L.alertasReporte(c.adv);
+    h += '<p class="rp-note" style="margin-top:10px">La posición en la carta no sustituye la clasificación SUCS, que además requiere la granulometría. Valores de LL, PL e IP informados como números enteros según D4318.</p>';
+    L.setReport($("#reporte"), h + L.reportFoot());
+  }
+
+  /* ---------- ejemplo, CSV, limpiar ---------- */
+  function mk(w, tara, seco) { return [tara, Math.round((tara + seco * (1 + w / 100)) * 100) / 100, Math.round((tara + seco) * 100) / 100]; }
+  function ejemplo() {
+    $("#metodo").value = "A"; $("#np").checked = false; $("#wn").value = ini(27);
+    tbLL.innerHTML = ""; tbPL.innerHTML = "";
+    [[17, 36.8, 14.82, 21.5, "A-1"], [22, 34.5, 15.1, 22.3, "A-2"], [28, 32.1, 14.95, 20.8, "A-3"], [33, 30.4, 15.3, 23.1, "A-4"]].forEach(function (r) {
+      const m = mk(r[1], r[2], r[3]); filaLL(r[0], m[0], m[1], m[2], r[4]);
+    });
+    [[22.8, 14.2, 6.1, "P-1"], [23.4, 14.5, 6.4, "P-2"]].forEach(function (r) { const m = mk(r[0], r[1], r[2]); filaPL(m[0], m[1], m[2], r[3]); });
+    calc();
+  }
+  function csv() {
+    const rows = [["Límite líquido"], ["N golpes", "Tara", "Masa tara (g)", "Tara+húmedo (g)", "Tara+seco (g)", "w (%)", "Usado"]];
+    leerLL().forEach(function (r) { if (isFinite(r.w)) rows.push([fmt(r.N, 0), r.id, fmt(r.tara, 2), fmt(r.hum, 2), fmt(r.sec, 2), fmt(r.w, 2), r.usar ? "sí" : "no"]); });
+    rows.push([], ["Límite plástico"], ["Tara", "Masa tara (g)", "Tara+húmedo (g)", "Tara+seco (g)", "w (%)"]);
+    leerPL().forEach(function (r) { if (isFinite(r.w)) rows.push([r.id, fmt(r.tara, 2), fmt(r.hum, 2), fmt(r.sec, 2), fmt(r.w, 2)]); });
+    L.downloadCSV("limites_consistencia.csv", rows);
+  }
+
+  /* ---------- arranque ---------- */
+  document.getElementById("site-author").textContent = (window.SITE && window.SITE.autor) || "";
+  L.initGeneral($("#general"), calc);
+  L.initDecimal($("#dec"), calc);
+  restaurar();
+  ["#tabLL", "#tabPL"].forEach(function (s) { L.enablePaste($(s), calc); $(s).addEventListener("input", calc); });
+  ["#np", "#wn"].forEach(function (s) { $(s).addEventListener("input", calc); $(s).addEventListener("change", calc); });
+  $("#metodo").addEventListener("change", function () {
+    const n = $$("tr.fila", tbLL).length;
+    if ($("#metodo").value === "B" && n > 2) $$("tr.fila", tbLL).slice(2).forEach(function (r) { r.remove(); });
+    if ($("#metodo").value === "A" && n < 3) for (let i = n; i < 4; i++) filaLL("", "", "", "", "");
+    calc();
+  });
+  $("#addLL").addEventListener("click", function () { filaLL("", "", "", "", "").querySelector("input").focus(); });
+  $("#addPL").addEventListener("click", function () { filaPL("", "", "", "").querySelector("input").focus(); });
+  $("#btnPdf").addEventListener("click", function () { L.imprimir("Limites de consistencia " + (L.getGeneral().muestra || "")); });
+  $("#btnCsv").addEventListener("click", csv);
+  $("#btnEj").addEventListener("click", ejemplo);
+  $("#allLL").addEventListener("click", function () { $$('[data-k="use"]', tbLL).forEach(function (c) { c.checked = true; }); calc(); });
+  $("#dropLL").addEventListener("click", function () {
+    const ok = leerLL().filter(function (r) { return r.usar && isFinite(r.N) && r.N > 0 && isFinite(r.w); });
+    if (ok.length < 4) { alert("Con menos de 4 puntos usados no conviene descartar ninguno: la norma exige 3 como mínimo."); return; }
+    const reg = S.limiteLiquidoMulti(ok.map(function (r) { return { N: r.N, w: r.w }; }));
+    let peor = null, dm = -1;
+    ok.forEach(function (r) { const d = Math.abs(r.w - (reg.b + reg.m * Math.log10(r.N))); if (d > dm) { dm = d; peor = r; } });
+    peor.tr.querySelector('[data-k="use"]').checked = false; calc();
+  });
+  $("#btnLimpiar").addEventListener("click", function () { if (!confirm("¿Borrar todos los datos de este ensayo?")) return; $("#np").checked = false; $("#wn").value = ""; base(); calc(); });
+  calc();
+})();
+</script>
+</body>
+</html>
